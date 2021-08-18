@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+    <head>    
+        <title>{{pgtitle}}</title>
+        <style>
+            body {
+                font-family: Verdana;
+                font-size: 14px;
+            }
+            h1 {
+                color: #000077;
+            }        
+            .hidden {
+                display: none;
+            }
+            ul {
+                list-style: none;
+                display: inline-block;
+                margin: 0;
+                padding: 0;
+            }
+            li {
+                clear: both;
+                padding: 10px;
+                display: block;
+                margin: auto;
+            }
+            li button {
+                display: block;
+                border-style: none;
+                border-radius: 2px;
+                outline: none;
+                color: red;
+                float: right;
+                cursor: pointer;
+                font-size: 20px;
+                font-weight: bold;
+                margin: 0 0 0 10px;
+            }
+            h4 {
+                vertical-align: top;
+            }
+            a {
+                color: lightblue;
+            }
+            .wrapper {
+                display: inline-block;
+                vertical-align: top;
+                border-style: none;
+                border-radius: 5px;
+                //background: #ffcccc; 
+                color: silver;
+                background: darkslategray;
+                padding: 20px;
+            }
+            .list-wrapper {
+                width: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>{{pgtitle}}</h1>
+        <br/>
+        <div class="wrapper list-wrapper">
+            <form id='lis-form'>
+                <label for="newlis">Add todolist:</label>
+                <input type="text" id="newcreatedlis" name="newlis">
+                <input type="submit" value="Create" />
+            </form>
+            <h4>Todo Lists</h4>
+            <ul id="lists">
+                {% for d in datalists %}
+                <li id="lis{{d.id}}" class='act-list-id'>
+                    <input class="lischeck-completed" data-id="{{d.id}}" type="checkbox" {% if d.completed %} checked {% else %} unchecked {% endif %} />
+                    <a href="/todos/list/{{d.id}}">
+                        {% if d.id == actlistid %}<strong>{% endif %}
+                        {{d.name}}
+                        {% if d.id == actlistid %}</strong>{% endif %}
+                    </a>
+                    <button class="bnt-deletelis" data-id="{{d.id}}">&cross;</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="wrapper">
+            <form id='tk-form'>
+                <label for="newtk">Add task:</label>
+                <input type="text" id="newcreatedtk" name="newtk">
+                <input type="submit" value="Create" />
+            </form>
+            <div id="error" class="hidden">Wehhh! Sorry, something went wrong! :(</div>
+            <h4>{{actlistname}}'s Tasks</h4>
+            <ul id="todos">
+                {% for d in todos %}
+                    {% if d.list_id == actlistid %}
+                        <li id="tk{{d.id}}">
+                            <input class="tkcheck-completed" data-id="{{d.id}}" type="checkbox" {% if d.completed %} checked {% else %} unchecked {% endif %} />
+                            {{d.description}}
+                            <button class="bnt-deletetk" data-id="{{d.id}}">&cross;</button>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>            
+        </div>
+    </body>
+    <script>
+        const listid_idx = 3; // index of the todolist-id argument inside the url pathname part (/todo/list/<todolist-id>)
+        const active_list_id = window.location.pathname.split('/')[listid_idx];
+        
+        console.log('script for ' + window.location);
+    
+        // implements child elements' autoremove functions
+        Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+        }
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for(var i = this.length - 1; i >= 0; i--) {
+                if(this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                }
+            }
+        }
+
+        // handles tasks deletion
+        //TODO: replace by polymorphism
+        del_handler = function(e, pref, parent)  {
+            const del_id = parent.dataset['id'];
+            console.log('deleting '+ pref + del_id + '...');
+            const li_del = document.getElementById(pref + del_id);
+            console.log('del clicked for id ' + pref + del_id + '!!!');
+            li_del.remove(); // uses the autoremove functions defined above
+            fetch(del_id + '/' + pref + '-deleted', {
+                method: 'DELETE',
+            })
+            .then(function() {
+                document.getElementById('error').className = 'hidden';
+                
+                if (pref === 'lis' && del_id == active_list_id) {
+                    console.log('deleting current list'); //DEBUG
+                    ulists = document.getElementById('lists');
+                    lists = ulists.querySelectorAll('.act-list-id');
+                    next_list_id = lists[0]['id'].substring(listid_idx,);
+                    console.log('first list to jump to = ' + next_list_id);
+                    locsplit = window.location.href.split('/');
+
+                    console.log('splited');
+                    locsplit[locsplit.length - 1] = next_list_id.toString();
+                    //console.log(locsplit.toString());
+                    new_url = locsplit.join('/');
+                    console.log(new_url);
+                    
+                    window.location.replace(new_url);
+                }
+                
+            })
+            .catch(function() {
+                document.getElementById('error').className = '';
+            })
+        };
+        
+        tk_del_handler = function(e) {
+            return del_handler(e, 'tk', this);
+        }
+
+        const bntDeletes = document.querySelectorAll('.bnt-deletetk');
+        for (let i = 0; i < bntDeletes.length; i++) {
+            const bntdel = bntDeletes[i];
+            bntdel.onclick = tk_del_handler;
+        }
+
+        // handles task lists' deletion
+        li_del_handler = function(e) {
+            return del_handler(e, 'lis', this);
+        }
+
+        const bntListDeletes = document.querySelectorAll('.bnt-deletelis');
+        for (let i = 0; i < bntListDeletes.length; i++) {
+            const bntdel = bntListDeletes[i];
+            bntdel.onclick = li_del_handler;
+        }    
+
+        console.log('after bnt-deletelis...'); //TODOAQ:
+
+        // handles changes to task's completed checkboxes
+        chk_change_handler = function(e, pref = 'tk') {
+            console.log('event: ', e);
+            const newCompleted = e.target.checked;                
+            const todoId = e.target.dataset['id'];
+            const resp_prop_name = pref + '-completed';
+            resp_obj = {}
+            resp_obj[resp_prop_name] = newCompleted;
+            fetch(todoId + '/set-' + pref + 'completed', {
+                method: 'POST',
+                body: JSON.stringify(resp_obj),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function() {
+                console.log('chk handler completed...');
+                document.getElementById('error').className = 'hidden';
+            })
+            .catch(function() {
+                document.getElementById('error').className = '';
+            })
+        }
+
+        const checkboxes = document.querySelectorAll('.tkcheck-completed');
+        for (let i = 0; i < checkboxes.length; i++) {
+            console.log('setting set-completed handler for check i = ' + i);
+            checkboxes[i].onchange = chk_change_handler;
+        }
+
+        // handles new generic items creation
+        onsubmit_gen_handler = function(e, pref) {
+            e.preventDefault(); //<!-- disables default behaviour of this handler -->
+            const descInput = document.getElementById('newcreated' + pref);
+            desc = descInput.value;
+            console.log(`onsubmit ${desc}...`)
+            descInput.value = '';
+
+            reqpropname = 'new' + pref
+            reqobj = {};
+            reqobj[reqpropname] = desc;            
+            if (pref === 'tk')
+                reqobj['newtk-listid'] = active_list_id;
+
+            const fetch_route = (pref === 'tk') ? 'create_todo' : 'create_list';
+            fetch(fetch_route, {
+                method: 'POST',
+                body: JSON.stringify(reqobj),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+             })
+            .then(response => response.json())
+            .then(jsonResponse => {
+                console.assert(pref === 'tk' || pref === 'lis');
+
+                const newdesc = jsonResponse['newdesc'];
+                const newid = jsonResponse['newid'];
+                console.log('future received reporting ' + newid + ' has been added...');
+
+                const liItem = document.createElement('LI');
+
+                const bntclassname = 'bnt-delete' + pref;
+                const chkclassname = pref + 'check-completed';
+                
+                href_open = (pref === 'lis') ? `<a href=/todos/list/${newid}>` : '';
+                href_close = (pref === 'lis') ? '</a>' : '';
+
+                liItem.innerHTML = `<input class="${chkclassname}" data-id=${newid} type="checkbox" />${href_open}${newdesc}${href_close}<button class="${bntclassname}" data-id="${newid}">&cross;</button>`;
+                console.log(liItem.innerHTML);
+                liItem.id = pref + newid;
+
+                parentid = (pref === 'tk') ? 'todos' : 'lists';
+                todoslist = document.getElementById(parentid);
+                todoslist.appendChild(liItem);
+                console.log('todolist html: ' + todoslist.innerHTML);
+                const bntDelete = liItem.querySelectorAll('.' + bntclassname)[0];
+
+                bntDelete.onclick = (pref === 'tk') ? tk_del_handler : li_del_handler;
+
+                const bntChk = liItem.querySelectorAll('.' + chkclassname)[0];
+
+                if (pref === 'tk')
+                    bntChk.onchange = chk_change_handler; //TODO: fazer para lis também
+
+                document.getElementById('error').className = 'hidden';
+            })
+            .catch(function(exc) {
+                console.log(exc);
+                document.getElementById('error').className = '';
+            })
+        }
+
+        //handles new tasks' creation   
+        tk_onsubmit_handler = function(e) {
+            onsubmit_gen_handler(e, 'tk');
+        }
+
+        //handles new todolist creation
+        lis_onsubmit_handler = function(e) {
+            onsubmit_gen_handler(e, 'lis');
+        }
+
+        const tkformobj = document.getElementById('tk-form');
+        tkformobj.onsubmit = tk_onsubmit_handler;
+
+        console.log('tk onsubmit added...');        
+
+        const lisformobj = document.getElementById('lis-form');
+        lisformobj.onsubmit = lis_onsubmit_handler;
+        
+        console.log('lis onsubmit added...');
+
+    </script>
+</html>
+        
