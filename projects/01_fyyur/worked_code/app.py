@@ -60,16 +60,20 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    looking_talent = db.Column(db.Boolean, default=False)
+    looking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     website_link = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
+    #TODO: upcoming shows - implement after adding Show
+    #TODO: past shows - implement after adding Show
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+
 
 #----------------------------------------------------------------------------#
 # Filters.
