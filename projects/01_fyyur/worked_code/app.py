@@ -47,10 +47,8 @@ class Venue(db.Model):
     website_link = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    #TODO: upcoming shows - implement after adding Show
-    #TODO: past shows - implement after adding Show
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    past_shows = db.relationship('Show', backref='venue', lazy=True)
+    upcoming_shows = db.relationship('Show', backref='venue', lazy=True)
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -66,18 +64,16 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     website_link = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
-    #TODO: upcoming shows - implement after adding Show
-    #TODO: past shows - implement after adding Show
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    past_shows = db.relationship('Show', backref='artist', lazy=True)
+    upcoming_shows = db.relationship('Show', backref='artist', lazy=True)
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
     __tablename__ = 'Show'
 
     id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer)
-    venue_id = db.Column(db.Integer)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'))
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'))
     start_datetime = db.Column(db.DateTime)
 
 
