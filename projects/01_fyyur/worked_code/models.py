@@ -36,8 +36,7 @@ class Venue(db.Model):
     website_link = db.Column(db.String(120))
     image_link = db.Column(db.String(500), nullable = False)
     facebook_link = db.Column(db.String(120))
-    past_shows = db.relationship('Show', backref='venue', lazy=True)
-    upcoming_shows = db.relationship('Show', backref='venue', lazy=True)
+    venue_shows = db.relationship('Show', backref='venue', lazy=True)
 
     def __repr__(self):
         return f'<Venue {self.id}: {self.name} phone: {self.phone}>'
@@ -56,8 +55,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500), nullable = False)
     website_link = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
-    past_shows = db.relationship('Show', backref='artist', lazy=True)
-    upcoming_shows = db.relationship('Show', backref='artist', lazy=True)
+    artist_shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
         return f'<Venue {self.id}: {self.name} phone: {self.phone}>'
