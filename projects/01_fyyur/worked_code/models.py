@@ -64,10 +64,9 @@ class Artist(db.Model):
 class Show(db.Model):
     __tablename__ = 'Show'
 
-    id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable = False)
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable = False)
-    start_datetime = db.Column(db.DateTime, nullable = False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable = False, primary_key=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable = False, primary_key=True)
+    start_time = db.Column(db.DateTime, nullable = False, primary_key=True)
 
     def __repr__(self):
         return f'<Venue {self.id}: from {self.artist_id} in {self.venue_id} at {self.start_datetime}>'

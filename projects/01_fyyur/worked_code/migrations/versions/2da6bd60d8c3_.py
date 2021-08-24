@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: 2da6bd60d8c3
-Revises: bff68c5371ed
+Revises: c6d585da2a49
 Create Date: 2021-08-20 19:03:06.592253
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers', 'used by Alembic.
 revision = '2da6bd60d8c3'
-down_revision = 'bff68c5371ed'
+down_revision = 'c6d585da2a49'
 branch_labels = None
 depends_on = None
 
@@ -55,7 +55,6 @@ def upgrade():
 
     op.execute('ALTER SEQUENCE "Venue_id_seq" RESTART WITH 1')
     op.execute('ALTER SEQUENCE "Artist_id_seq" RESTART WITH 4')
-    op.execute('ALTER SEQUENCE "Show_id_seq" RESTART WITH 1')
     
     # insert Venue's mock data
     for venue_values in mock_Venue_data_list:
