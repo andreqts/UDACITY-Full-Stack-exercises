@@ -29,7 +29,7 @@ mock_Artist_data_list = [
     [ "'The Wild Sax Band'", "'San Francisco'",  "'CA'",   "'432-325-5432'", "false", "''", "'Jazz, Classical'", "'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80'", "null", "null", ],
 ]
 
-Show_fields         = [ 'artist_id', 'venue_id', 'start_datetime' ]
+Show_fields         = [ 'artist_id', 'venue_id', 'start_time' ]
 mock_Show_fields    = [
     [ "4", "1", "'2019-05-21T21:30:00.000Z'"],
     [ "5", "3", "'2019-06-15T23:00:00.000Z'"],
