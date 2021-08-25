@@ -57,7 +57,7 @@ def venues():
     city_venues = Venue.query.filter(or_(Venue.city==city, Venue.state==state)).all()
     venues_list = []
     for v in city_venues:
-      upcomming_shows_cnt = Show.query.filter_by(venue_id=v.id).filter(Show.start_time > func.now()).count()
+      upcomming_shows_cnt = v.get_upcoming_shows_count()
       name_value = v.name
       if app.debug: #show upcoming count in debug, since it is not shown to the user
         name_value += f" [{upcomming_shows_cnt} upcoming shows]"
@@ -92,7 +92,7 @@ def search_venues():
     found_data.append({
       "id": venue.id,
       "name": venue.name,
-      "num_upcoming_shows": Show.query.filter_by(venue_id=venue.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).count(),
+      "num_upcoming_shows": venue.get_upcoming_shows_count(),
     })
 
   response={
@@ -109,9 +109,9 @@ def show_venue(pvenue_id):
   venueobj = Venue.query.filter_by(id=pvenue_id).one()
   
   venueobj.genres = venueobj.genres.split(',')
-  venueobj.past_shows = Show.query.filter_by(venue_id=pvenue_id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time <= func.now()).all()
+  venueobj.past_shows = venueobj.get_past_shows()
   venueobj.past_shows_count = len(venueobj.past_shows)
-  venueobj.upcoming_shows = Show.query.filter_by(venue_id=pvenue_id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).all()
+  venueobj.upcoming_shows = venueobj.get_upcoming_shows()
   venueobj.upcoming_shows_count = len(venueobj.upcoming_shows)
 
   return render_template('pages/show_venue.html', venue=venueobj)

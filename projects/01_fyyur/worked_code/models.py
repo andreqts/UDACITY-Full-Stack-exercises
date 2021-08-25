@@ -4,6 +4,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, or_, and_
 from flask_migrate import Migrate
 
 #----------------------------------------------------------------------------#
@@ -37,6 +38,20 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500), nullable = False)
     facebook_link = db.Column(db.String(120))
     venue_shows = db.relationship('Show', backref='venue', lazy=True)
+
+    # helper methods (guided by the famous "DRY" principle)
+    def get_upcoming_shows(self):
+        return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).all()
+
+    def get_upcoming_shows_count(self):
+        return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).count()
+
+    def get_past_shows(self):
+        return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time <= func.now()).all()
+
+    def get_past_shows_count(self):
+        return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time <= func.now()).count()
+
 
     def __repr__(self):
         return f'<Venue {self.id}: {self.name} phone: {self.phone}>'
