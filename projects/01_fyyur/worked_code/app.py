@@ -8,7 +8,7 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
@@ -51,29 +51,31 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  data = []
+  locales = Venue.query.with_entities(Venue.city, Venue.state).group_by(Venue.city, Venue.state)
+  for city, state in locales:
+    city_venues = Venue.query.filter(or_(Venue.city==city, Venue.state==state)).all()
+    venues_list = []
+    for v in city_venues:
+      upcomming_shows_cnt = Show.query.filter_by(venue_id=v.id).filter(Show.start_time > func.now()).count()
+      name_value = v.name
+      if app.debug: #show upcoming count in debug, since it is not shown to the user
+        name_value += f" [{upcomming_shows_cnt} upcoming shows]"
+      venues_list.append({
+        "id": v.id,
+        "name": name_value,
+        "num_upcoming_shows": upcomming_shows_cnt,
+      })
+
+      #show Venues with more upcoming shows first, highlithing them (relevance)
+      venues_list.sort(reverse=True, key=(lambda d : d["num_upcoming_shows"]))
+
+    data.append ({
+    "city": city,
+    "state": state,
+    "venues": venues_list
+    })
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
