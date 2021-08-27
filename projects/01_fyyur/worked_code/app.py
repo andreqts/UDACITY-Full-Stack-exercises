@@ -55,7 +55,7 @@ def venues():
   data = []
   locales = Venue.query.with_entities(Venue.city, Venue.state).group_by(Venue.city, Venue.state)
   for city, state in locales:
-    city_venues = Venue.query.filter(or_(Venue.city==city, Venue.state==state)).all()
+    city_venues = Venue.query.filter(and_(Venue.city==city, Venue.state==state)).all()
     venues_list = []
     for v in city_venues:
       upcomming_shows_cnt = v.get_upcoming_shows_count()
