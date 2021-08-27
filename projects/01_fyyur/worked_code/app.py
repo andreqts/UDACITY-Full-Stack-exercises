@@ -322,7 +322,6 @@ def create_artist_submission():
 def shows():
   # displays list of shows at /shows
   shows = Show.query.join(Artist).join(Venue).with_entities(Venue.id, Venue.name, Artist.id, Artist.name, Artist.image_link, Show.start_time).all()
-  print(shows)
 
   shows_data = []
   for venue_id, venue_name, artist_id, artist_name, artist_link, show_time in shows:
@@ -345,14 +344,31 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
 
-  # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  no_error_occurred = True
+  new_show = Show(
+    artist_id = request.form['artist_id'],
+    venue_id = request.form['venue_id'],
+    start_time = request.form['start_time'], 
+  )
+
+  session = db.session()
+  try:
+    session.add(new_show)
+    session.commit()
+  except:
+    print(f'Error creating show "{request.form}": {sys.exc_info()}')
+    flash('Sorry, new show at venue id ' + request.form['venue_id'] + ' could not be listed, please contact the support!')
+    session.rollback()
+    no_error_occurred = False
+  finally:
+    if no_error_occurred:
+      new_show = session.query(Show).filter_by(artist_id=new_show.artist_id,venue_id=new_show.venue_id,start_time=new_show.start_time).one()
+    session.close()
+
+  if (no_error_occurred):
+    flash(f'Show by artist {new_show.artist_id} at venue id {new_show.venue_id} successfully listed!')
+
   return render_template('pages/home.html')
 
 @app.errorhandler(404)
