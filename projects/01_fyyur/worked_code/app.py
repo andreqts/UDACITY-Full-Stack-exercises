@@ -277,14 +277,41 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  
+  values_lst = dict(request.form.lists())
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  b_seeking = ('seeking_venue' in values_lst.keys()) and (request.form['seeking_venue'].lower() == 'y')
+
+  no_error_occurred = True
+  new_artist = Artist(
+    name = request.form['name'],
+    city = request.form['city'],
+    state = request.form['state'],
+    phone = request.form['phone'],
+    seeking_venue = b_seeking,
+    seeking_description = request.form['seeking_description'],
+    genres = ','.join(values_lst['genres']),
+    image_link = request.form['image_link'],
+    website_link = request.form['website_link'],
+    facebook_link = request.form['facebook_link'],    
+  )
+
+  session = db.session()
+  try:
+    session.add(new_artist)
+    session.commit()
+    createdartist = Artist.query.get(new_artist.id)
+  except:
+    print(f'Error creating artist {request.form["name"]}: {sys.exc_info()}')
+    flash('Sorry, artist ' + request.form['name'] + ' could not be listed, please contact the support!')
+    session.rollback()
+    no_error_occurred = False
+  finally:
+    session.close()
+
+  if (no_error_occurred):
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+
   return render_template('pages/home.html')
 
 

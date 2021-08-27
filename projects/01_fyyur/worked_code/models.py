@@ -44,7 +44,6 @@ class Venue(db.Model):
         return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).all()
 
     def get_upcoming_shows_count(self):
-        #return Show.query.filter_by(venue_id=self.id).join(Artist, Show.artist_id==Artist.id).filter(Show.start_time > func.now()).count()
         return Show.query.filter_by(venue_id=self.id).filter(Show.start_time > func.now()).count()
 
     def get_past_shows(self):
