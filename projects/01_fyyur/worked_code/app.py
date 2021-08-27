@@ -16,6 +16,7 @@ from flask_wtf import Form
 from forms import *
 import os
 from models import *
+import sys
 
 
 moment = Moment(app)
@@ -122,14 +123,41 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  newvalueslist = dict(request.form.lists())
+  no_error_occurred = True
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  # special treatment, since it is not sent if unchecked
+  seeking = ('seeking_talent' in newvalueslist.keys()) and (request.form['seeking_talent'] == 'y')
+
+  newvenue = Venue(
+    name = request.form['name'],
+    genres = ','.join(newvalueslist['genres']),
+    city = request.form['city'],
+    state = request.form['state'],
+    address = request.form['address'],
+    phone = request.form['phone'],
+    seeking_talent = seeking,
+    seeking_description = request.form['seeking_description'],
+    website_link = request.form['website_link'],
+    image_link = request.form['image_link'],
+    facebook_link = request.form['facebook_link'],
+  )
+  session = db.session()
+  try:
+    session.add(newvenue)
+    session.commit()
+    createdvenue = Venue.query.get(newvenue.id)
+  except:
+    print(f'Error creating venue {request.form["name"]}: {sys.exc_info()}')
+    flash('Sorry, Venue ' + request.form['name'] + ' could not be listed, please contact the support!')
+    session.rollback()
+    no_error_occurred = False
+  finally:
+    session.close()
+
+  if (no_error_occurred):
+    flash('Venue ' + createdvenue.name + ' successfully listed!')
+
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
