@@ -17,16 +17,16 @@ depends_on = None
 
 Venue_fields = [ 'name', 'city', 'state', 'address', 'phone', 'image_link', 'facebook_link', 'genres', 'seeking_talent', 'seeking_description', 'website_link']
 mock_Venue_data_list = [
-    [ "'The Musical Hop'", "'San Francisco'",  "'CA'",   "'1015 Folsom Street'", "'123-123-1234'", "'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'", "'https://www.facebook.com/TheMusicalHop'", "'JAZZ, REGGAE, SWING, CLASSICAL, FOLK'", "true", "'We are on the lookout for a local artist to play every two weeks. Please call us.'", "'https://www.themusicalhop.com'", ],
-    [ "'The Dueling Pianos Bar'", "'New York'",  "'NY'",   "'335 Delancey Street'", "'914-003-1132'", "'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'", "'https://www.facebook.com/theduelingpianos'", "'Classical, R&B, Hip-Hop'", "false", "''", "'https://www.theduelingpianos.com'", ],
+    [ "'The Musical Hop'", "'San Francisco'",  "'CA'",   "'1015 Folsom Street'", "'123-123-1234'", "'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'", "'https://www.facebook.com/TheMusicalHop'", "'Jazz,Reggae,Swing,Classical,Folk'", "true", "'We are on the lookout for a local artist to play every two weeks. Please call us.'", "'https://www.themusicalhop.com'", ],
+    [ "'The Dueling Pianos Bar'", "'New York'",  "'NY'",   "'335 Delancey Street'", "'914-003-1132'", "'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'", "'https://www.facebook.com/theduelingpianos'", "'Classical,R&B,Hip-Hop'", "false", "''", "'https://www.theduelingpianos.com'", ],
     [ "'Park Square Live Park Square Music & Coffee'", "'San Francisco'",  "'CA'",   "'34 Whiskey Moore Ave'", "'415-000-1234'", "'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80'", "'https://www.facebook.com/ParkSquareLiveMusicAndCoffee'", "'Rock'", "false", "''", "'https://www.parksquarelivemusicandcoffee.com'", ],
 ]
 
 Artist_fields = [ 'name', 'city', 'state', 'phone', 'seeking_venue', 'seeking_description', 'genres', 'image_link', 'website_link', 'facebook_link']
 mock_Artist_data_list = [
-    [ "'Guns N Petals'", "'San Francisco'",  "'CA'",   "'326-123-5000'", "true", "'Looking for shows to perform at in the San Francisco Bay Area!'", "'Rock N Roll'", "'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'", "'https://www.gunsnpetalsband.com'", "'https://www.facebook.com/GunsNPetals'", ],
+    [ "'Guns N Petals'", "'San Francisco'",  "'CA'",   "'326-123-5000'", "true", "'Looking for shows to perform at in the San Francisco Bay Area!'", "'Rock n Roll'", "'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'", "'https://www.gunsnpetalsband.com'", "'https://www.facebook.com/GunsNPetals'", ],
     [ "'Matt Quevedo'", "'New York'",  "'NY'",   "'300-400-5000'", "false", "''", "'Jazz'", "'https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'", "null", "'https://www.facebook.com/mattquevedo923251523'", ],
-    [ "'The Wild Sax Band'", "'San Francisco'",  "'CA'",   "'432-325-5432'", "false", "''", "'Jazz, Classical'", "'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80'", "null", "null", ],
+    [ "'The Wild Sax Band'", "'San Francisco'",  "'CA'",   "'432-325-5432'", "false", "''", "'Jazz,Classical'", "'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80'", "null", "null", ],
 ]
 
 Show_fields         = [ 'artist_id', 'venue_id', 'start_time' ]

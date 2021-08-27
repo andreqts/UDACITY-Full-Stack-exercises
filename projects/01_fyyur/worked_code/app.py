@@ -225,6 +225,7 @@ def edit_artist(artist_id):
     flash(f'Sorry, could not retrieve data on artist {artist_id}, please contact the support!')
     return redirect(url_for('show_artist', artist_id=artist_id))
 
+  print('set genres = "{}"'.format(artist.genres)) #TODOAQ:
   form = ArtistForm(
     name = artist.name,
     genres = artist.genres.split(','),
@@ -246,8 +247,6 @@ def edit_artist_submission(artist_id):
   # artist record with ID <artist_id> using the new attributes
   edited_data_lists = dict(request.form.lists())
 
-  print(edited_data_lists)
-
   b_seeking = ('seeking_venue' in edited_data_lists.keys()) and (request.form['seeking_venue'].lower() == 'y')
 
   try:
@@ -265,6 +264,7 @@ def edit_artist_submission(artist_id):
     artist.seeking_venue = b_seeking
     artist.seeking_description = request.form['seeking_description']
     artist.genres = ','.join(edited_data_lists['genres'])
+    print('set genres = "{}"'.format(artist.genres)) #TODOAQ:
     artist.image_link = request.form['image_link']
     artist.website_link = request.form['website_link']
     artist.facebook_link = request.form['facebook_link']
@@ -283,29 +283,71 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-  form = VenueForm()
-  venue={
-    "id": 1,
-    "name": "The Musical Hop",
-    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-    "address": "1015 Folsom Street",
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "123-123-1234",
-    "website": "https://www.themusicalhop.com",
-    "facebook_link": "https://www.facebook.com/TheMusicalHop",
-    "seeking_talent": True,
-    "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-    "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  }
-  # TODO: populate form with values from venue with ID <venue_id>
+  
+  try:
+    venue = Venue.query.get(venue_id)
+  except:
+    print(f'Error retrieving venue {venue_id} data: {sys.exc_info()}')
+    flash(f'Sorry, could not retrieve data on venue {venue_id}, please contact the support!')
+    return redirect(url_for('show_venue', pvenue_id=venue_id))
+
+  print('=> genres = {}'.format(venue.genres.split(',')))
+
+  form = VenueForm(
+    id = venue.id,
+    name = venue.name,
+    genres = venue.genres.split(','),
+    city = venue.city,
+    state = venue.state,
+    address = venue.address,
+    phone = venue.phone,
+    seeking_talent = venue.seeking_talent,
+    seeking_description = venue.seeking_description,
+    website_link = venue.website_link,
+    image_link = venue.image_link,
+    facebook_link = venue.facebook_link,
+  )
+
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
-  return redirect(url_for('show_venue', venue_id=venue_id))
+  edited_data_lists = dict(request.form.lists())
+
+  b_seeking = ('seeking_talent' in edited_data_lists.keys()) and (request.form['seeking_talent'].lower() == 'y')
+
+  try:
+    venue = Venue.query.get(venue_id)
+  except:
+    print(f'Error retrieving venue {venue_id} data: {sys.exc_info()}')
+    flash(f'Sorry, could not retrieve data on venue {venue_id}, please contact the support!')
+    return redirect(url_for('show_venue', pvenue_id=venue_id))
+
+  try:
+    venue.name = request.form['name']
+    venue.genres = ','.join(edited_data_lists['genres'])
+    venue.city = request.form['city']
+    venue.state = request.form['state']
+    venue.address = request.form['address']
+    venue.phone = request.form['phone']
+    venue.seeking_talent = b_seeking
+    venue.seeking_description = request.form['seeking_description']
+    venue.website_link = request.form['website_link']
+    venue.image_link = request.form['image_link']
+    venue.facebook_link = request.form['facebook_link']
+    db.session.commit()
+  except:
+    print(f'Error editing venue {venue_id} data: {sys.exc_info()}')
+    flash(f'Sorry, could not edit data on venue {venue_id}, please contact the support!')
+    db.session.rollback()
+    return redirect(url_for('show_venue', pvenue_id=venue_id))
+  finally:
+    db.session.close()
+
+  flash(f'Venue {request.form["name"]} with id={venue_id} successfully edited!')
+
+  return redirect(url_for('show_venue', pvenue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
