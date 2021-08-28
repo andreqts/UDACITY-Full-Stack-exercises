@@ -34,6 +34,13 @@
     <script type="text/javascript" src="/static/js/script.js" defer></script>
     <!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
     <!-- /scripts -->
+
+    <style>
+        .error {
+            background-color: red;
+            color: whitesmoke;
+        }
+    </style>
 </head>
 
 <body>
@@ -79,8 +86,8 @@
         <!-- Begin page content -->
         <main id="content" role="main" class="container">
 
-            {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
-            <div class="alert alert-block alert-info fade in">
+            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+            <div class="{{ category }} alert alert-block alert-info fade in">
                 <a class="close" data-dismiss="alert">&times;</a> {{ message }}
             </div>
             {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}

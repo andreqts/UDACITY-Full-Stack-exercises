@@ -6,6 +6,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, or_, and_
 from flask_migrate import Migrate
+from flask_wtf import CsrfProtect, csrf
+
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -14,6 +16,8 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+
+csrf.CSRFProtect(app)
 
 # connect to a local postgresql database
 migrate = Migrate(app, db)
@@ -88,7 +92,6 @@ class Artist(db.Model):
     def __repr__(self):
         return f'<Venue {self.id}: {self.name} phone: {self.phone}>'
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
     __tablename__ = 'Show'
 

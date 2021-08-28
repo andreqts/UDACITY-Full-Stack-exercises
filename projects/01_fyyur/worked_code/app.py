@@ -18,8 +18,10 @@ import os
 from models import *
 import sys
 
+from models import csrf
 
 moment = Moment(app)
+
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -41,6 +43,16 @@ app.jinja_env.filters['datetime'] = format_datetime
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
+
+def flash_errors(form):
+  """Flashes form errors"""
+  for field, errors in form.errors.items():
+      for error in errors:
+          flash(u"Error in the %s field - %s" % (
+              getattr(form, field).label.text,
+              error
+          ), category='error')
+
 
 @app.route('/')
 def index():
@@ -101,8 +113,6 @@ def search_venues():
 
 @app.route('/venues/<int:pvenue_id>')
 def show_venue(pvenue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
   venueobj = Venue.query.filter_by(id=pvenue_id).one()
   
   venueobj.genres = venueobj.genres.split(',')
@@ -125,6 +135,12 @@ def create_venue_form():
 def create_venue_submission():
   newvalueslist = dict(request.form.lists())
   no_error_occurred = True
+
+  form = VenueForm(request.form)
+  if not form.validate():
+    print('New venue form validation failed!')
+    flash_errors(form)
+    return render_template('forms/new_venue.html', form=form)
 
   # special treatment, since it is not sent if unchecked
   seeking = ('seeking_talent' in newvalueslist.keys()) and (request.form['seeking_talent'] == 'y')
@@ -149,7 +165,7 @@ def create_venue_submission():
     createdvenue = Venue.query.get(newvenue.id)
   except:
     print(f'Error creating venue {request.form["name"]}: {sys.exc_info()}')
-    flash('Sorry, Venue ' + request.form['name'] + ' could not be listed, please contact the support!')
+    flash('Sorry, Venue ' + request.form['name'] + ' could not be listed, please contact the support!', category='error')
     session.rollback()
     no_error_occurred = False
   finally:
@@ -162,10 +178,7 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-  print('Receive DELETE for id = ' + venue_id)
-  
+ 
   try:
     venue_to_delete = Venue.query.get(venue_id)
   except:
@@ -249,7 +262,6 @@ def edit_artist(artist_id):
     flash(f'Sorry, could not retrieve data on artist {artist_id}, please contact the support!')
     return redirect(url_for('show_artist', artist_id=artist_id))
 
-  print('set genres = "{}"'.format(artist.genres)) #TODOAQ:
   form = ArtistForm(
     name = artist.name,
     genres = artist.genres.split(','),
@@ -267,11 +279,7 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
   edited_data_lists = dict(request.form.lists())
-
-  b_seeking = ('seeking_venue' in edited_data_lists.keys()) and (request.form['seeking_venue'].lower() == 'y')
 
   try:
     artist = Artist.query.get(artist_id)
@@ -280,6 +288,14 @@ def edit_artist_submission(artist_id):
     flash(f'Sorry, could not retrieve data on artist {artist_id}, please contact the support!')
     return redirect(url_for('show_artist', artist_id=artist_id))
 
+  form = ArtistForm(request.form)
+  if not form.validate():
+    print('Form Validation failed!')
+    flash_errors(form)
+    return render_template('forms/edit_artist.html', form=form, artist=artist)
+
+
+  b_seeking = ('seeking_venue' in edited_data_lists.keys()) and (request.form['seeking_venue'].lower() == 'y')
   try:
     artist.name = request.form['name']
     artist.city = request.form['city']
@@ -288,7 +304,6 @@ def edit_artist_submission(artist_id):
     artist.seeking_venue = b_seeking
     artist.seeking_description = request.form['seeking_description']
     artist.genres = ','.join(edited_data_lists['genres'])
-    print('set genres = "{}"'.format(artist.genres)) #TODOAQ:
     artist.image_link = request.form['image_link']
     artist.website_link = request.form['website_link']
     artist.facebook_link = request.form['facebook_link']
@@ -336,7 +351,6 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
   edited_data_lists = dict(request.form.lists())
 
   b_seeking = ('seeking_talent' in edited_data_lists.keys()) and (request.form['seeking_talent'].lower() == 'y')
@@ -347,6 +361,12 @@ def edit_venue_submission(venue_id):
     print(f'Error retrieving venue {venue_id} data: {sys.exc_info()}')
     flash(f'Sorry, could not retrieve data on venue {venue_id}, please contact the support!')
     return redirect(url_for('show_venue', pvenue_id=venue_id))
+
+  form = VenueForm(request.form)
+  if not form.validate():
+    print('Edit venue form validation failed!')
+    flash_errors(form)
+    return render_template('forms/edit_venue.html', form=form, venue=venue)
 
   try:
     venue.name = request.form['name']
@@ -386,6 +406,12 @@ def create_artist_submission():
   
   values_lst = dict(request.form.lists())
 
+  form = ArtistForm(request.form)
+  if not form.validate():
+    print('New artist form validation failed!')
+    flash_errors(form)
+    return render_template('forms/new_artist.html', form=form)
+
   b_seeking = ('seeking_venue' in values_lst.keys()) and (request.form['seeking_venue'].lower() == 'y')
 
   no_error_occurred = True
@@ -409,7 +435,7 @@ def create_artist_submission():
     createdartist = Artist.query.get(new_artist.id)
   except:
     print(f'Error creating artist {request.form["name"]}: {sys.exc_info()}')
-    flash('Sorry, artist ' + request.form['name'] + ' could not be listed, please contact the support!')
+    flash('Sorry, artist ' + request.form['name'] + ' could not be listed, please contact the support!', category='error')
     session.rollback()
     no_error_occurred = False
   finally:
@@ -451,6 +477,12 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
 
+  form = ShowForm(request.form)
+  if not form.validate():
+    print('New show form validation failed!')
+    flash_errors(form)
+    return render_template('forms/new_show.html', form=form)
+
   no_error_occurred = True
   new_show = Show(
     artist_id = request.form['artist_id'],
@@ -464,7 +496,7 @@ def create_show_submission():
     session.commit()
   except:
     print(f'Error creating show "{request.form}": {sys.exc_info()}')
-    flash('Sorry, new show at venue id ' + request.form['venue_id'] + ' could not be listed, please contact the support!')
+    flash('Sorry, new show at venue id ' + request.form['venue_id'] + ' could not be listed, please contact the support!', category='error')
     session.rollback()
     no_error_occurred = False
   finally:

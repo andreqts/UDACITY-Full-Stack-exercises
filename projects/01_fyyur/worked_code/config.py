@@ -15,3 +15,8 @@ dbname = 'fyyurdb'
 # TODO IMPLEMENT DATABASE URL
 SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}/{}'.format(dbuser, dbpassword, dbhost, dbname)
 SQLALCHEMY_TRACK_MODIFICATIONS = True  #explicit is better than implicit...
+
+# Workaround for Flask bug on CSRF
+#see more info in: https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask#what-causes-bad-request-csrf-token-missing
+#IMPORTANT: do not use local.dev, see: https://stackoverflow.com/questions/25277457/google-chrome-redirecting-localhost-to-https
+SERVER_NAME = 'local.test:5000'
