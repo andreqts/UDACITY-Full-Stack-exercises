@@ -89,7 +89,9 @@ def venues():
     "venues": venues_list
     })
 
-  return render_template('pages/venues.html', areas=data);
+  form = VenueForm(data)
+
+  return render_template('pages/venues.html', areas=data, form=form);
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -109,7 +111,9 @@ def search_venues():
     "data": found_data,
   }
 
-  return render_template('pages/search_venues.html', results=response, search_term=str_to_search)
+  form=VenueForm()
+
+  return render_template('pages/search_venues.html', results=response, form=form, search_term=str_to_search)
 
 @app.route('/venues/<int:pvenue_id>')
 def show_venue(pvenue_id):
@@ -121,7 +125,7 @@ def show_venue(pvenue_id):
   venueobj.upcoming_shows = venueobj.get_upcoming_shows()
   venueobj.upcoming_shows_count = len(venueobj.upcoming_shows)
 
-  return render_template('pages/show_venue.html', venue=venueobj)
+  return render_template('pages/show_venue.html', venue=venueobj, form=VenueForm())
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -176,8 +180,9 @@ def create_venue_submission():
 
   return render_template('pages/home.html')
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<int:venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
+  print('delete...') #TODO:
  
   try:
     venue_to_delete = Venue.query.get(venue_id)
@@ -189,6 +194,7 @@ def delete_venue(venue_id):
     return make_response(jsonify(message=msgerror), 500)
 
   venue_name = venue_to_delete.name
+  print('Will delete venue {}'.format(venue_name)) #TODO:
   try:
     db.session.delete(venue_to_delete)
     db.session.commit()
@@ -216,7 +222,9 @@ def artists():
   for art_id, art_name in artists_data:
     data.append({ "id": art_id, "name": art_name })
 
-  return render_template('pages/artists.html', artists=data)
+  form = ArtistForm(artists_data)
+
+  return render_template('pages/artists.html', artists=data, form=form)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
@@ -236,7 +244,7 @@ def search_artists():
     "count": len(artists_found),
     "data": artists_data
   }
-  return render_template('pages/search_artists.html', results=response, search_term=term_to_search)
+  return render_template('pages/search_artists.html', results=response, search_term=term_to_search, form=ArtistForm())
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
@@ -248,7 +256,7 @@ def show_artist(artist_id):
   artist_data.upcoming_shows_count = len(artist_data.upcoming_shows)
   artist_data.genres = artist_data.genres.split(',')
 
-  return render_template('pages/show_artist.html', artist=artist_data)
+  return render_template('pages/show_artist.html', artist=artist_data, form=ArtistForm())
 
 #  Update
 #  ----------------------------------------------------------------
@@ -318,7 +326,7 @@ def edit_artist_submission(artist_id):
 
   flash(f'Artist {request.form["name"]} with id={artist_id} successfully edited!')
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
+  return redirect(url_for('show_artist', artist_id=artist_id, form=form))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
@@ -360,7 +368,7 @@ def edit_venue_submission(venue_id):
   except:
     print(f'Error retrieving venue {venue_id} data: {sys.exc_info()}')
     flash(f'Sorry, could not retrieve data on venue {venue_id}, please contact the support!')
-    return redirect(url_for('show_venue', pvenue_id=venue_id))
+    return redirect(url_for('show_venue', pvenue_id=venue_id, form=VenueForm()))
 
   form = VenueForm(request.form)
   if not form.validate():
@@ -391,7 +399,7 @@ def edit_venue_submission(venue_id):
 
   flash(f'Venue {request.form["name"]} with id={venue_id} successfully edited!')
 
-  return redirect(url_for('show_venue', pvenue_id=venue_id))
+  return redirect(url_for('show_venue', pvenue_id=venue_id, form=form))
 
 #  Create Artist
 #  ----------------------------------------------------------------
@@ -466,7 +474,37 @@ def shows():
     "start_time": show_time
     })
 
-  return render_template('pages/shows.html', shows=shows_data)
+  return render_template('pages/shows.html', shows=shows_data, form=ShowForm())
+
+@app.route('/shows/search', methods=['POST'])
+def search_shows():
+  str_to_search = request.form.get('search_term', '')
+
+  try:
+    shows = Show.query.join(Artist, Venue).with_entities(Venue.id, Venue.name, Artist.id, Artist.name, Artist.image_link, Show.start_time).filter(or_(Artist.name.ilike(f"%%{str_to_search}%%"), Venue.name.ilike(f"%%{str_to_search}%%"))).all()
+  except:
+    print(f'Error searching shows by name {str_to_search}: {sys.exc_info()}')
+    flash('Sorry, and error occurred while searching shows, please contact the support!', category='error')
+    return render_template('pages/shows.html', shows=[], form=ShowForm())
+
+  shows_data = []
+  for venue_id, venue_name, artist_id, artist_name, artist_link, show_time in shows:
+    shows_data.append({
+    "venue_id": venue_id,
+    "venue_name": venue_name,
+    "artist_id": artist_id,
+    "artist_name": artist_name,
+    "artist_image_link": artist_link,
+    "start_time": show_time
+    })
+
+  response={
+    "count": len(shows_data),
+    "data": shows_data
+  }
+
+  return render_template('pages/shows.html', shows=shows_data, form=ShowForm())
+  
 
 @app.route('/shows/create')
 def create_shows():
