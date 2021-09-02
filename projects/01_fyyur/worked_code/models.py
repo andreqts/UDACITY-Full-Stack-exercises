@@ -17,7 +17,8 @@ app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-csrf.CSRFProtect(app)
+# Required by Flask when accessing remotely, not in localhost
+#csrf.CSRFProtect(app)
 
 # connect to a local postgresql database
 migrate = Migrate(app, db)
