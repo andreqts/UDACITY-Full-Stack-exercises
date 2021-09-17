@@ -1,12 +1,25 @@
+import sys
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, json, request, abort, jsonify
+from werkzeug.wrappers.json import JSONMixin
 from flask_sqlalchemy import SQLAlchemy #, or_
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import random
+
 
 from models import setup_db, Book
 
 BOOKS_PER_SHELF = 8
+
+def paginate_books(request, selection):
+  page = request.args.get('page', 1, type=int)
+  start = (page - 1) * BOOKS_PER_SHELF
+  end = start + BOOKS_PER_SHELF
+
+  books = [book.format() for book in selection]
+  current_books = books[start:end]
+
+  return current_books
 
 # @TODO: General Instructions
 #   - As you're creating endpoints, define them and then search for 'TODO' within the frontend to update the endpoints there. 
@@ -28,7 +41,6 @@ def create_app(test_config=None):
     return response
 
   @app.route('/')
-  @cross_origin(methods=['POST'])
   def index():
     return 'Hello from my interface'
 
@@ -41,7 +53,18 @@ def create_app(test_config=None):
   @app.route('/books')
   #@cross_origin()
   def get_books():
-    return 'TODO: here I will return the books...'
+        selection = Book.query.order_by(Book.id).all()
+        current_books = paginate_books(request, selection)
+
+        if len(current_books) == 0:
+          abort(404)
+
+        return jsonify({
+          'success': True,
+          'books': current_books,
+          'total_books': len(Book.query.all())
+        })
+    #return 'TODO: here I will return the books...'
 
   
 
@@ -50,6 +73,28 @@ def create_app(test_config=None):
   #         and should follow API design principles regarding method and route.  
   #         Response body keys: 'success'
   # TEST: When completed, you will be able to click on stars to update a book's rating and it will persist after refresh
+  @app.route('/books/<int:book_id>', methods=['PATCH'])
+  def update_book(book_id):
+    body = request.get_json()
+
+    try:
+      book = Book.query.filter(Book.id == book_id).one_or_none()
+      if book is None:
+        abort(404)
+
+      if 'rating' in body:
+        book.rating = int(body.get('rating'))
+
+      book.update()
+
+      return jsonify({
+        'success': True,
+        'id': book.id,
+      })
+
+    except:
+      print(sys.exc_info())
+      abort(404)
 
 
   # @TODO: Write a route that will delete a single book. 
