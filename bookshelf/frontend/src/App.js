@@ -18,7 +18,7 @@ class App extends Component {
 
     getBooks = () => {
         $.ajax({
-            url: `localhost:5000/books?page=${this.state.page}`, //TODO: update request URL
+            url: `http://localhost:5000/books?page=${this.state.page}`, //TODO: update request URL
             type: "GET",
             crossDomain: true,
             success: (result) => {
@@ -29,7 +29,7 @@ class App extends Component {
                 return;
             },
             error: (error) => {
-                alert('Unable to load books (is it a CORS problem?). Please try your request again')
+                alert('Unable to load books (is it a CORS problem?). Please try your request again - error:' + error.Message)
                 return;
             }
         })
