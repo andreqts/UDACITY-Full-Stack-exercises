@@ -87,9 +87,9 @@ class BookTestCase(unittest.TestCase):
         res = self.client().delete("/books/1000")
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "unprocessable")
+        self.assertEqual(data["message"], "resource not found")
 
     def test_create_new_book(self):
         res = self.client().post("/books", json=self.new_book)
