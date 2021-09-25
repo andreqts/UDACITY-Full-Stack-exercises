@@ -1,10 +1,12 @@
 import os
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy  # , or_
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from flask_cors import CORS
 import random
 
 from models import setup_db, Book
+from werkzeug.exceptions import HTTPException
 
 BOOKS_PER_SHELF = 8
 
@@ -19,6 +21,10 @@ def paginate_books(request, selection):
 
     return current_books
 
+def search_books(keyword):
+    selection = Book.query.filter(or_(Book.title.ilike(f'%{keyword}%'), Book.author.ilike(f'%{keyword}%'))).all()
+    books = [book.format() for book in selection]
+    return books
 
 def create_app(test_config=None):
     # create and configure the app
@@ -39,8 +45,14 @@ def create_app(test_config=None):
 
     @app.route("/books")
     def retrieve_books():
-        selection = Book.query.order_by(Book.id).all()
-        current_books = paginate_books(request, selection)
+        current_books = []
+        if 'searchterm' in request.args:
+            keyword = request.args.get("searchterm", '', type=str)
+            if len(keyword):
+                current_books = search_books(keyword)           
+        else:
+            selection = Book.query.order_by(Book.id).all()
+            current_books = paginate_books(request, selection)
 
         if len(current_books) == 0:
             abort(404)
@@ -86,9 +98,8 @@ def create_app(test_config=None):
                 abort(404)
 
             book.delete()
-            selection = Book.query.order_by(Book.id).all()
+            selection = Book.query.order_by(Book.id).all()            
             current_books = paginate_books(request, selection)
-
             return jsonify(
                 {
                     "success": True,
@@ -98,6 +109,8 @@ def create_app(test_config=None):
                 }
             )
 
+        except HTTPException:
+            raise
         except:
             abort(422)
 
@@ -128,11 +141,6 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    # @TODO: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
-    #        the body argument is called 'search' coming from the frontend.
-    #        If you use a different argument, make sure to update it in the frontend code.
-    #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term
-    #        Response body keys: 'success', 'books' and 'total_books'
 
     @app.errorhandler(404)
     def not_found(error):

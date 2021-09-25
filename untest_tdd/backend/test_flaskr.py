@@ -50,8 +50,35 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "resource not found")
 
-    # @TODO: Write tests for search - at minimum two
-    #        that check a response when there are results and when there are none
+    def test_search_book_by_title(self):
+        test_searchterm = 'novel'
+        res = self.client().get("/books?searchterm={}".format(test_searchterm))
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+        bookslst = data["books"]
+        self.assertTrue(len(bookslst)==3)
+        self.assertTrue(str(bookslst) == "[{'author': 'Lisa Halliday', 'id': 2, 'rating': 4, 'title': 'Asymmetry: A Novel'}, {'author': 'Gina Apostol', 'id': 9, 'rating': 5, 'title': 'Insurrecto: A Novel'}, {'author': 'Jojo Moyes', 'id': 5, 'rating': 5, 'title': 'Still Me: A Novel'}]")
+
+    def test_search_book_by_author(self):
+        test_searchterm = 'neil'
+        res = self.client().get("/books?searchterm={}".format(test_searchterm))
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+        bookslst = data["books"]
+        self.assertTrue(len(bookslst)==2)
+        print('Books found searching for "Neil": "{}"'.format(str(bookslst)))
+        self.assertTrue(str(bookslst) == "[{'author': 'Neil Gaiman', 'id': 23, 'rating': 5, 'title': 'Anansi Boys'}, {'author': 'Neil Gaiman', 'id': 24, 'rating': 5, 'title': 'Anansi Boys'}]")
+
+    def test_404_search_nonexistent_book(self):
+        test_searchterm = 'anythingnonexistent'
+        res = self.client().get("/books?searchterm={}".format(test_searchterm))
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
 
     def test_update_book_rating(self):
         res = self.client().patch("/books/5", json={"rating": 1})
