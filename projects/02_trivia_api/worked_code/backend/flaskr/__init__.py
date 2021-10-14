@@ -45,6 +45,22 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+  @app.route('/questions')
+  def get_questions():
+    print('get questions...') #TODOAQ:
+    selection = Question.query.order_by(Question.id).all()
+    current_questions = get_paginated_questions(request, selection)
+
+    if len(current_questions) == 0:
+          page = request.args.get('page', 1, type=int)
+          msg = f'Page {page} not found in the database'
+          abort(404, msg)
+
+    return jsonify({
+          'success': True,
+          'books': current_questions,
+          'total_books': len(Question.query.all())
+        })
 
 
   '''
