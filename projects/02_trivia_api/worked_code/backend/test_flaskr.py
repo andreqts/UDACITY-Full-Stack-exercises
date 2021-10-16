@@ -87,10 +87,8 @@ class TriviaTestCase(unittest.TestCase):
     def test_404_get_nonexistant_page_of_questions(self):
         nonexistent_page = 1000
         res = self.client().get("/questions?page={}".format(nonexistent_page))
-        print('404 response data = {}'.format(str(res.data)))
         data = json.loads(res.data)
-        print('data = {}'.format(data))
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["error"], 404)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], f'Page {nonexistent_page} not found in the database')
 

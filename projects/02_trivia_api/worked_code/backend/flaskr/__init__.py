@@ -17,6 +17,7 @@ def get_paginated_questions(request, selection):
   current_questions = questions[start:end]
 
   return current_questions
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -47,18 +48,20 @@ def create_app(test_config=None):
 
   @app.route('/questions')
   def get_questions():
-    print('get questions...') #TODOAQ:
     selection = Question.query.order_by(Question.id).all()
     current_questions = get_paginated_questions(request, selection)
 
     if len(current_questions) == 0:
           page = request.args.get('page', 1, type=int)
           msg = f'Page {page} not found in the database'
-          abort(404, msg)
+          return jsonify({
+            'success': False,
+            'error': 404,
+            'message': msg,
+          })
   
     #with_entities returns the fields in a tuple
     categories = [ category[0] for category in  Category.query.with_entities(Category.type).order_by(Category.id).all()]
-    print(f'DEBUG categories = {categories}')
 
     return jsonify({
           'questions': current_questions,
