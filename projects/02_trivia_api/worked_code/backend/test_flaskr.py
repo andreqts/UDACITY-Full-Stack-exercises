@@ -58,8 +58,8 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertTrue(data["total_books"])
-        self.assertTrue(len(data["books"]) == QUESTIONS_PER_PAGE)
+        self.assertTrue(data["total_questions"])
+        self.assertTrue(len(data["questions"]) == QUESTIONS_PER_PAGE)
 
     def test_get_page_1_of_questions(self):
         res = self.client().get("/questions?page=1")
@@ -67,8 +67,8 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertTrue(data["total_books"])
-        self.assertTrue(len(data["books"]) == QUESTIONS_PER_PAGE)
+        self.assertTrue(data["total_questions"])
+        self.assertTrue(len(data["questions"]) == QUESTIONS_PER_PAGE)
 
     def test_get_page_2_of_questions(self):
         res = self.client().get("/questions?page=2")
@@ -81,15 +81,18 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertTrue(data["total_books"])
-        self.assertTrue(len(data["books"]) == QUESTIONS_PAGE2)
+        self.assertTrue(data["total_questions"])
+        self.assertTrue(len(data["questions"]) == QUESTIONS_PAGE2)
     
     def test_404_get_nonexistant_page_of_questions(self):
-        res = self.client().get("/questions?page=1000")
+        nonexistent_page = 1000
+        res = self.client().get("/questions?page={}".format(nonexistent_page))
+        print('404 response data = {}'.format(str(res.data)))
         data = json.loads(res.data)
+        print('data = {}'.format(data))
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "resource not found")
+        self.assertEqual(data["message"], f'Page {nonexistent_page} not found in the database')
 
 
 
