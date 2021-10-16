@@ -61,12 +61,16 @@ def create_app(test_config=None):
           })
   
     #with_entities returns the fields in a tuple
-    categories = [ category[0] for category in  Category.query.with_entities(Category.type).order_by(Category.id).all()]
+    categories = [cat.format() for cat in Category.query.order_by(Category.id).all()]
+
+    categories_dict = {}
+    for cat in categories:
+      categories_dict[cat['id']] = cat['type']
 
     return jsonify({
           'questions': current_questions,
           'total_questions': len(Question.query.all()),
-          'categories': categories,
+          'categories': categories_dict,
           'current_category': None,
           'success': True,
     })

@@ -88,10 +88,9 @@ class TriviaTestCase(unittest.TestCase):
         nonexistent_page = 1000
         res = self.client().get("/questions?page={}".format(nonexistent_page))
         data = json.loads(res.data)
-        self.assertEqual(data["error"], 404)
         self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 404)        
         self.assertEqual(data["message"], f'Page {nonexistent_page} not found in the database')
-
 
 
 # Make the tests conveniently executable
