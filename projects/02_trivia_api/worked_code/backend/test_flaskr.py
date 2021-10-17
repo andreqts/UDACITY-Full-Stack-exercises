@@ -92,6 +92,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["error"], 404)        
         self.assertEqual(data["message"], f'Page {nonexistent_page} not found in the database')
 
+    def test_delete_question(self):
+        question_id = 10
+        res = self.client().delete(f"/questions/{question_id}")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["deleted"], question_id)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
