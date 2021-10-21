@@ -152,6 +152,20 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["created_id"], 24)        
         self.assertEqual(data["total_questions"], prev_total + 1)
 
+    def test_get_categories(self):
+        res = self.client().get("/categories")
+        data = json.loads(res.data)
+
+        CATEGORIES_TOTAL = 6
+        categories = data['categories']
+        categories_total = len(categories)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(categories_total, CATEGORIES_TOTAL)
+        self.assertEqual(data["total_categories"], categories_total)
+        self.assertEqual(categories["1"], 'Science')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

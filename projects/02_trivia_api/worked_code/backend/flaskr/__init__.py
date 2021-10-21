@@ -18,6 +18,15 @@ def get_paginated_questions(request, selection):
 
   return current_questions
 
+def categories_to_dict(categories_selection):
+  categories = [cat.format() for cat in categories_selection]
+
+  categories_dict = {}
+  for cat in categories:
+    categories_dict[cat['id']] = cat['type']
+
+  return categories_dict
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -61,11 +70,8 @@ def create_app(test_config=None):
           })
   
     #with_entities returns the fields in a tuple
-    categories = [cat.format() for cat in Category.query.order_by(Category.id).all()]
-
-    categories_dict = {}
-    for cat in categories:
-      categories_dict[cat['id']] = cat['type']
+    categories_selection = Category.query.order_by(Category.id).all()
+    categories_dict = categories_to_dict(categories_selection)
 
     return jsonify({
           'questions': current_questions,
@@ -161,6 +167,24 @@ def create_app(test_config=None):
     except:
       abort(422)
 
+  
+  @app.route('/categories')
+  def get_categories():
+    try:
+      selection = Category.query.all()
+      
+      categories_dict = categories_to_dict(selection)
+
+      return jsonify({
+        'success': True,
+        'categories': categories_dict,
+        'total_categories': len(selection),
+      })
+
+    except:
+      abort(422)
+  
+  
   '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
