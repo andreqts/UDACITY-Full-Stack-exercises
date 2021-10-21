@@ -112,7 +112,30 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(data["total_questions"])
         self.assertTrue(len(data["questions"]) == QUESTIONS_PAGE2)
-    
+
+    def test_get_questions_by_category(self):
+        CATEGORY_TO_SEARCH = 2
+        res = self.client().get("/categories/{}/questions".format(
+                CATEGORY_TO_SEARCH,
+            ))
+        EXPECTED_TOTAL_QUESTIONS = 4
+        data = json.loads(res.data)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["total_questions"])
+        self.assertEqual(len(data["questions"]), EXPECTED_TOTAL_QUESTIONS)
+        self.assertEqual(data["current_category"], "Art")
+
+
+    def test_404_get_questions_of_nonexistent_category(self):
+        CATEGORY_TO_SEARCH = 1000
+        res = self.client().get("/categories/{}/questions".format(
+                CATEGORY_TO_SEARCH,
+            ))
+        data = json.loads(res.data)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 404)        
+        self.assertEqual(data["message"], f'Category {CATEGORY_TO_SEARCH} not found in the database')
+
     def test_404_get_nonexistant_page_of_questions(self):
         nonexistent_page = 1000
         res = self.client().get("/questions?page={}".format(nonexistent_page))

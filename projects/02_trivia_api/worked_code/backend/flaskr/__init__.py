@@ -185,6 +185,45 @@ def create_app(test_config=None):
       abort(422)
   
   
+  @app.route('/categories/<int:cat_id>/questions')
+  def get_questions_by_category(cat_id):
+    category = []
+    try:
+      category = Category.query.get(cat_id)
+      print('category = "{}"'.format(category))
+    except:
+      abort(422)
+
+    if (category is None):
+      msg = f'Category {cat_id} not found in the database'
+      return jsonify({
+        'success': False,
+        'error': 404,
+        'message': msg,
+      })
+
+    selection = []
+    try:
+      selection = Question.query.filter_by(category=cat_id).all()
+
+      total_questions = len(selection)
+      assert(total_questions <= QUESTIONS_PER_PAGE)
+    except HTTPException:
+        raise
+    except:
+        abort(422)
+     
+    questions = [question.format() for question in selection]
+
+    return jsonify({
+      'success': True,
+      'questions': questions,
+      'total_questions': len(Question.query.all()),
+      'current_category': category.type,
+    })
+
+
+
   '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
