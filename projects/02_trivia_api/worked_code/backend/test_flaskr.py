@@ -1,4 +1,6 @@
-import os
+import os, sys
+from re import sub
+import subprocess
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -9,13 +11,20 @@ from models import setup_db, Question, Category
 QUESTIONS_PER_PAGE = 10
 QUESTIONS_TOTAL = 19
 
+
+
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
     def setUp(self):
         """Define test variables and initialize app."""
+        print('SETTING UP NEW TEST...')
         testConfig = {} # for now it is just used to allow skiping config
                         # stuff that is not used when testing
+
+        
+        # Does not work here, since I cant disconnect completely in tearDown
+        #subprocess.call('./inittestdb.sh')
 
         self.app = create_app(testConfig)
         self.client = self.app.test_client
@@ -46,7 +55,27 @@ class TriviaTestCase(unittest.TestCase):
     
     def tearDown(self):
         """Executed after reach test"""
+        print('==> TEAR DOWN TEST CONNECTIONS...')
         pass
+
+        # To make each test independent, I would like to reset the database here and
+        # recreate it in setUp, but I could not manage to disconnect, and I have seen
+        # in StackOverflow it is not easy to do:
+
+        # with self.app.app_context():
+        #     try:
+        #         print('starting to close...')
+        #         self.db.session.remove()
+        #         print('session closed...')
+        #     except:
+        #         print(sys.exc_info())
+        #         abort(500)
+        #     try:
+        #         self.db.engine.dispose()
+        #         print('database connection disposed')
+        #     except:
+        #         print(sys.exc_info())
+        #         abort(500)
 
     """
     TODO
@@ -94,6 +123,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_question(self):
         question_id = 10
+       
         res = self.client().delete(f"/questions/{question_id}")
         data = json.loads(res.data)
 
@@ -101,6 +131,26 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertEqual(data["deleted"], question_id)
 
+    def test_add_question(self):
+        self.new_question = {
+            "question": 'Who discovered the America?',
+            "answer": 'Christopher Columbus',
+            'difficulty': 4,
+            'category': 4,
+        }
+
+        prev_total = len(Question.query.all())
+        
+        res = self.client().post(f"/questions", json=self.new_question)
+        data = json.loads(res.data)
+
+        data = json.loads(res.data)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["created_id"], 24)        
+        self.assertEqual(data["total_questions"], prev_total + 1)
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
+    subprocess.call('./inittestdb.sh') # resets de database (does not work in setUp)
     unittest.main()
