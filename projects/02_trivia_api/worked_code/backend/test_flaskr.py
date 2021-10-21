@@ -18,7 +18,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def setUp(self):
         """Define test variables and initialize app."""
-        print('SETTING UP NEW TEST...')
+        # print('SETTING UP NEW TEST...')
         testConfig = {} # for now it is just used to allow skiping config
                         # stuff that is not used when testing
 
@@ -55,7 +55,7 @@ class TriviaTestCase(unittest.TestCase):
     
     def tearDown(self):
         """Executed after reach test"""
-        print('==> TEAR DOWN TEST CONNECTIONS...')
+        # print('==> TEAR DOWN TEST CONNECTIONS...')
         pass
 
         # To make each test independent, I would like to reset the database here and
@@ -123,6 +123,8 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_question(self):
         question_id = 10
+
+        prev_total = len(Question.query.all())
        
         res = self.client().delete(f"/questions/{question_id}")
         data = json.loads(res.data)
@@ -130,6 +132,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
         self.assertEqual(data["deleted"], question_id)
+        self.assertEqual(data["total_questions"], prev_total - 1)
 
     def test_add_question(self):
         self.new_question = {

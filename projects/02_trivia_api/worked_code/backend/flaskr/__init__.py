@@ -100,7 +100,6 @@ def create_app(test_config=None):
   @app.route('/questions/<int:question_id>', methods = ['DELETE'])
   def delete_question(question_id):
     try:
-      print('received request to delete question {}'.format(question_id)) #TODOAQ:
       question = Question.query.filter_by(id=question_id).one_or_none()
 
       if question is None:
@@ -112,11 +111,14 @@ def create_app(test_config=None):
         })
 
       question.delete()
+
+      total_questions = len(Question.query.all())
       
       return jsonify(
         {
             "success": True,
             "deleted": question_id,
+            "total_questions": total_questions,
         }
       )
     except HTTPException:
