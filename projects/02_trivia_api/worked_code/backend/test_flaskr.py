@@ -1,5 +1,5 @@
 import os, sys
-from re import sub
+from re import search, sub
 import subprocess
 import unittest
 import json
@@ -189,6 +189,23 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["total_categories"], categories_total)
         self.assertEqual(categories["1"], 'Science')
 
+    def test_search_questions(self):
+        search_term = 'the'
+        res = self.client().post("/questions/search", json={ 'searchTerm': search_term })
+        data = json.loads(res.data)
+        EXPECTED_TOTAL_MIN = 10
+
+        all_have_term = True
+        for q in data['questions']:
+            if search_term not in q['question'].lower():
+                print('===> "{}" not found in "{}"'.format(search_term, q['question']))
+                all_have_term = False
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(len(data["questions"]) > EXPECTED_TOTAL_MIN)
+        self.assertTrue(all_have_term)
+        self.assertEqual(data["total_questions"], len(Question.query.all()))
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

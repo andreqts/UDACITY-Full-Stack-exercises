@@ -1,4 +1,4 @@
-import os
+import os, sys
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -77,7 +77,7 @@ def create_app(test_config=None):
           'questions': current_questions,
           'total_questions': len(Question.query.all()),
           'categories': categories_dict,
-          'current_category': None,
+          'current_category': '',
           'success': True,
     })
 
@@ -190,7 +190,6 @@ def create_app(test_config=None):
     category = []
     try:
       category = Category.query.get(cat_id)
-      print('category = "{}"'.format(category))
     except:
       abort(422)
 
@@ -222,7 +221,23 @@ def create_app(test_config=None):
       'current_category': category.type,
     })
 
+  @app.route('/questions/search', methods=['POST'])
+  def search_venues():
+    try:
+      body = request.get_json()
+      str_to_search = body.get('searchTerm', '')
+      selection = Question.query.filter(Question.question.ilike(f'%{str_to_search}%')).all()
+      questions_found = [question.format() for question in selection]
+    except:
+      print(sys.exc_info())
+      abort(422)
 
+    return jsonify({
+      'success': True,
+      'questions': questions_found,
+      'total_questions': len(Question.query.all()),
+      'current_category': '',
+    })
 
   '''
   @TODO: 

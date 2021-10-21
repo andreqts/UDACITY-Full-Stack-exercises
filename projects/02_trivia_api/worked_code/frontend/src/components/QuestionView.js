@@ -23,14 +23,15 @@ class QuestionView extends Component {
 
   getQuestions = () => {
     $.ajax({
-      url: `/questions?page=${this.state.page}`, //TODO: update request URL
+      url: `/questions?page=${this.state.page}`,
       type: "GET",
       success: (result) => {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
           categories: result.categories,
-          currentCategory: result.current_category })
+          currentCategory: result.current_category 
+        })
         return;
       },
       error: (error) => {
@@ -60,7 +61,7 @@ class QuestionView extends Component {
 
   getByCategory= (id) => {
     $.ajax({
-      url: `/categories/${id}/questions`, //TODO: update request URL
+      url: `/categories/${id}/questions`,
       type: "GET",
       success: (result) => {
         this.setState({
@@ -76,13 +77,13 @@ class QuestionView extends Component {
     })
   }
 
-  submitSearch = (searchTerm) => {
+  submitSearch = (psearchTerm) => {
     $.ajax({
-      url: `/questions`, //TODO: update request URL
+      url: `/questions/search`,
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({searchTerm: searchTerm}),
+      data: JSON.stringify({searchTerm: psearchTerm}),
       xhrFields: {
         withCredentials: true
       },
@@ -91,7 +92,7 @@ class QuestionView extends Component {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
-          currentCategory: result.current_category })
+          currentCategory: result.current_category });
         return;
       },
       error: (error) => {
@@ -103,9 +104,9 @@ class QuestionView extends Component {
 
   questionAction = (id) => (action) => {
     if(action === 'DELETE') {
-      if(window.confirm('are you sure you want to delete the question?')) {
+      if(window.confirm('Are you really sure you want to delete this question?')) {
         $.ajax({
-          url: `/questions/${id}`, //TODO: update request URL
+          url: `/questions/${id}`,
           type: "DELETE",
           success: (result) => {
             this.getQuestions();
