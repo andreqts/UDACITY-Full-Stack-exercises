@@ -291,10 +291,11 @@ def create_app(test_config=None):
       abort(422)
 
     if len(select_cat) == 0:
+      abort(404)
       return jsonify({ #TODOAQ: return with abort instead?
         'success': False,
         'error': 404,
-        'msg': 'Category "{}" (id={}) not found in the database!'.format(
+        'message': 'Category "{}" (id={}) not found in the database!'.format(
           quiz_category['type'],
           quiz_category['id'],
         ),
@@ -325,7 +326,28 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+  @app.errorhandler(404)
+  def not_found(error):
+    return (
+      jsonify({
+        'success': False,
+        'error': 404,
+        'message': "resource not found in the server's database"
+      }),
+      404,
+    )
   
+  @app.errorhandler(422)
+  def unprocessable_entity(error):
+    return (
+      jsonify({
+        'success': False,
+        'error': 422,
+        'message': "unprocessable entity - your request is correctly formated but the server is unable to process it"
+      }),
+      422,
+    )
+
   return app
 
     
