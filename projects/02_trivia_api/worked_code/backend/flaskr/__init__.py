@@ -301,12 +301,10 @@ def create_app(test_config=None):
       })
 
     allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
-    print('allowed = ', allowed_questions)
     allowed_questions_cnt =len(select_cat)
 
     if allowed_questions_cnt > 0:
       rnd.shuffle(allowed_questions)
-      print('suffled_questions = ', allowed_questions)
 
       chosen_question = null
       for q in allowed_questions:
