@@ -2,9 +2,10 @@ import os, sys
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import random
+import random as rnd
 
 from models import setup_db, Question, Category
+from sqlalchemy.sql.expression import null
 
 QUESTIONS_PER_PAGE = 10
 
@@ -271,6 +272,71 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+
+  @app.route('/quizzes', methods=['POST'])
+  def get_quizzes():
+    body = request.get_json()
+    prev_question = body.get('previous_questions', '')
+    quiz_category = body.get('quiz_category', '')
+
+    #TODOAQ:
+    print('Getting next question for category id={}({})'.format(quiz_category['id'], quiz_category['type']))
+    print('Prev. questions: ', prev_question)
+
+    select_cat = None
+    try:
+      if quiz_category['id'] == 0: # All categories
+        select_cat = Question.query.all()
+      else:
+        select_cat = Question.query.filter_by(category=quiz_category['id']).all()
+    except:
+      print(sys.exc_info())
+      abort(422)
+
+    if len(select_cat) == 0:
+      return jsonify({ #TODOAQ: return with abort instead?
+        'success': False,
+        'error': 404,
+        'msg': 'Category "{}" (id={}) not found in the database!'.format(
+          quiz_category['type'],
+          quiz_category['id'],
+        ),
+      })
+
+    #TODOAQ:
+    print('questions returned for cat {} = {}'.format(quiz_category['id'], len(select_cat)))
+    print('<{}>'.format([q.id for q in select_cat]))
+
+    allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
+    print('allowed = ', allowed_questions)
+    allowed_questions_cnt =len(select_cat)
+
+    if allowed_questions_cnt > 0:
+      rnd.shuffle(allowed_questions)
+      print('suffled_questions = ', allowed_questions)
+
+      chosen_question = null
+      for q in allowed_questions:
+        print('check question id = ', q.id) #TODOAQ:
+        if q.id not in prev_question:
+          chosen_question = q
+          print('question id = {} not in prev'.format(q.id)) #TODOAQ:
+          break
+        ### TODOAQ: ###
+        else:
+          print('{} was in previous questions'.format(q.id))
+        ### TODOAQ: ###
+
+    #TODOAQ:
+    print('-> chosen question = {}'.format(chosen_question))
+
+    next_question = chosen_question.format() if chosen_question != null else ''
+  
+    return jsonify({
+      'success': True,
+      'question': next_question,
+      'current_category': quiz_category,
+    })
 
   '''
   @TODO: 

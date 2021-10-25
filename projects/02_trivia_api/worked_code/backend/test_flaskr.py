@@ -207,6 +207,41 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(all_have_term)
         self.assertEqual(data["total_questions"], len(Question.query.all()))
 
+    def test_quizz(self):
+        res = self.client().post("/quizzes", json={
+                'previous_questions': [ 9, 12, 23, 24 ], 
+                'quiz_category': { 'id': 4, 'type': 'History' },
+            })
+        data = json.loads(res.data)
+
+        self.assertTrue(data["success"])
+        self.assertEqual(data['question']['id'], 5)
+        self.assertEqual(data['current_category']['type'], 'History')
+
+    def test_quiz_all_categories(self):
+        res = self.client().post("/quizzes", json={
+                'previous_questions': [ 9, 12, 23, 24 ], 
+                'quiz_category': { 'id': 0, 'type': 'All' },
+            })
+        data = json.loads(res.data)
+
+        self.assertTrue(data["success"])
+        self.assertTrue(data['question']['id'] > 0)
+        self.assertEqual(data['current_category']['type'], 'All')
+
+
+    def test_error_404_quizz_with_nonexistent_category(self):
+        res = self.client().post("/quizzes", json={
+                'previous_questions': [ 9, 12, 23, 24 ], 
+                'quiz_category': { 'id': 1000, 'type': 'Nonexistent' },
+            })
+        data = json.loads(res.data)
+
+        self.assertFalse(data["success"])
+        self.assertEqual(data['error'], 404)
+        self.assertEqual(data['msg'], 'Category "Nonexistent" (id=1000) not found in the database!')
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     subprocess.call('./inittestdb.sh') # resets de database (does not work in setUp)

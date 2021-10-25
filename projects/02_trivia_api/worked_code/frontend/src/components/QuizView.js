@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 import '../stylesheets/QuizView.css';
 
-const questionsPerPlay = 5; 
+const questionsPerPlay = 5;
 
 class QuizView extends Component {
   constructor(props){
@@ -14,6 +14,7 @@ class QuizView extends Component {
         showAnswer: false,
         categories: {},
         numCorrect: 0,
+        total_responded: 0,
         currentQuestion: {},
         guess: '',
         forceEnd: false
@@ -22,7 +23,7 @@ class QuizView extends Component {
 
   componentDidMount(){
     $.ajax({
-      url: `/categories`, //TODO: update request URL
+      url: `/categories`,
       type: "GET",
       success: (result) => {
         this.setState({ categories: result.categories })
@@ -35,7 +36,7 @@ class QuizView extends Component {
     })
   }
 
-  selectCategory = ({type, id=0}) => {
+  selectCategory = ({type='All', id=0}) => {
     this.setState({quizCategory: {type, id}}, this.getNextQuestion)
   }
 
@@ -46,6 +47,9 @@ class QuizView extends Component {
   getNextQuestion = () => {
     const previousQuestions = [...this.state.previousQuestions]
     if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
+
+    console.log('previous_questions = ' + previousQuestions.length)
+    console.log('category = ' + this.state.quizCategory['type'])
 
     $.ajax({
       url: '/quizzes', //TODO: update request URL
@@ -81,6 +85,7 @@ class QuizView extends Component {
     event.preventDefault();
     const formatGuess = this.state.guess.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase()
     let evaluate =  this.evaluateAnswer()
+    this.state.total_responded++
     this.setState({
       numCorrect: !evaluate ? this.state.numCorrect : this.state.numCorrect + 1,
       showAnswer: true,
@@ -93,6 +98,7 @@ class QuizView extends Component {
       previousQuestions: [], 
       showAnswer: false,
       numCorrect: 0,
+      total_responded: 0,
       currentQuestion: {},
       guess: '',
       forceEnd: false
@@ -104,7 +110,7 @@ class QuizView extends Component {
           <div className="quiz-play-holder">
               <div className="choose-header">Choose Category</div>
               <div className="category-holder">
-                  <div className="play-category" onClick={this.selectCategory}>ALL</div>
+                  <div className="play-category" onClick={() => this.selectCategory({type:'All', id:0})}>ALL</div>
                   {Object.keys(this.state.categories).map(id => {
                   return (
                     <div
@@ -124,7 +130,7 @@ class QuizView extends Component {
   renderFinalScore(){
     return(
       <div className="quiz-play-holder">
-        <div className="final-header"> Your Final Score is {this.state.numCorrect}</div>
+        <div className="final-header"> Your Final Score is {this.state.numCorrect} correct out of {this.state.total_responded} questions!</div>
         <div className="play-again button" onClick={this.restartGame}> Play Again? </div>
       </div>
     )
@@ -161,6 +167,8 @@ class QuizView extends Component {
               <input type="text" name="guess" onChange={this.handleChange}/>
               <input className="submit-guess button" type="submit" value="Submit Answer" />
             </form>
+            <p>Question {this.state.previousQuestions.length} from a maximum of {questionsPerPlay}</p>
+            <p>You've got {this.state.numCorrect} questions right so far</p>
           </div>
         )
   }
