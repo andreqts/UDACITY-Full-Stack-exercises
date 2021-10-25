@@ -45,7 +45,7 @@ def create_app(test_config=None):
   '''
   # CORS Headers 
   @app.after_request
-  def after_request(response):
+  def after_request(response):    
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
@@ -279,10 +279,6 @@ def create_app(test_config=None):
     prev_question = body.get('previous_questions', '')
     quiz_category = body.get('quiz_category', '')
 
-    #TODOAQ:
-    print('Getting next question for category id={}({})'.format(quiz_category['id'], quiz_category['type']))
-    print('Prev. questions: ', prev_question)
-
     select_cat = None
     try:
       if quiz_category['id'] == 0: # All categories
@@ -303,10 +299,6 @@ def create_app(test_config=None):
         ),
       })
 
-    #TODOAQ:
-    print('questions returned for cat {} = {}'.format(quiz_category['id'], len(select_cat)))
-    print('<{}>'.format([q.id for q in select_cat]))
-
     allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
     print('allowed = ', allowed_questions)
     allowed_questions_cnt =len(select_cat)
@@ -317,18 +309,9 @@ def create_app(test_config=None):
 
       chosen_question = null
       for q in allowed_questions:
-        print('check question id = ', q.id) #TODOAQ:
         if q.id not in prev_question:
           chosen_question = q
-          print('question id = {} not in prev'.format(q.id)) #TODOAQ:
           break
-        ### TODOAQ: ###
-        else:
-          print('{} was in previous questions'.format(q.id))
-        ### TODOAQ: ###
-
-    #TODOAQ:
-    print('-> chosen question = {}'.format(chosen_question))
 
     next_question = chosen_question.format() if chosen_question != null else ''
   

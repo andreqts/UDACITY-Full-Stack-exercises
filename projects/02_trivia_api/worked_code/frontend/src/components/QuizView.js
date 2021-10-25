@@ -48,11 +48,8 @@ class QuizView extends Component {
     const previousQuestions = [...this.state.previousQuestions]
     if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
 
-    console.log('previous_questions = ' + previousQuestions.length)
-    console.log('category = ' + this.state.quizCategory['type'])
-
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: '/quizzes',
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
