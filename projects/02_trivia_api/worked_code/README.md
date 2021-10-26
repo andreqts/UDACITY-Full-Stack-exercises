@@ -7,24 +7,32 @@ Udacity is invested in creating bonding experiences for its employees and studen
 
 This application includes the following features:
 
-1. Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer.
+1. Display questions - both all questions and by category. Questions should show the question, category, and difficulty rating by default and can show/hide the answer.
 2. Delete questions.
-3. Add questions and require that they include question and answer text.
+3. Add questions and require that they include a question and answer text.
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
 ## Installation
 
-To be able to locally run this application, you can proceed with the following steps:
+To be able to run this application locally, you can proceed with the following steps:
+1. Fork this repo
+2. Clone it
+3. Create a new python environment to this application.
+4. Install the requirements from the `requirements.txt` file in the `backend` folder, running the following command in your command line:
+    `pip install -r requirements.txt`.       
+5. Set the environment variable `FLASK_APP` as `flaskr`, and optionally you can set `FLASK_ENV` as `development` to run in debug mode. Look at your operating system documentation to see how to set those variables (hint: you can use the `export` command in Linux, and the `set` command in Windows).
+6. Go to the backend folder and start the backend application with the following command: `flask run`.
+7. Go to the frontend folder and start the frontend application by running the following command: `npm start`.
 
 ## About the Stack
 
 This full stack application is designed with some key functional areas:
 
 ### Backend
-The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory contains a complete Flask and SQLAlchemy server. You works primarily in `__init__.py` to define the backend's endpoints, and can reference models.py for DB and SQLAlchemy setup.
+The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory contains a complete Flask and SQLAlchemy server. The file `__init__.py` defines the backend endpoints and can reference models.py for DB and SQLAlchemy setup.
 
-To 
+
 
 
 ### Frontend
