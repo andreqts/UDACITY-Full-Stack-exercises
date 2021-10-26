@@ -239,7 +239,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertFalse(data["success"])
         self.assertEqual(data['error'], 404)
-        self.assertEqual(data['msg'], 'Category "Nonexistent" (id=1000) not found in the database!')
+        self.assertEqual(data['message'], 'Category "Nonexistent" (id=1000) not found in the database!')
 
 
 # Make the tests conveniently executable

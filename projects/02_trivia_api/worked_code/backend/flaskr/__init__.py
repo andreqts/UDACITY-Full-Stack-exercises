@@ -65,11 +65,7 @@ def create_app(test_config=None):
     if len(current_questions) == 0:
           page = request.args.get('page', 1, type=int)
           msg = f'Page {page} not found in the database'
-          return jsonify({
-            'success': False,
-            'error': 404,
-            'message': msg,
-          })
+          abort(404, msg)
   
     #with_entities returns the fields in a tuple
     categories_selection = Category.query.order_by(Category.id).all()
@@ -112,11 +108,7 @@ def create_app(test_config=None):
 
       if question is None:
         msg = f'Question {question_id} not found in the database'
-        return jsonify({
-          'success': False,
-          'error': 404,
-          'message': msg,
-        })
+        abort(404, msg)
 
       question.delete()
 
@@ -197,11 +189,7 @@ def create_app(test_config=None):
 
     if (category is None):
       msg = f'Category {cat_id} not found in the database'
-      return jsonify({
-        'success': False,
-        'error': 404,
-        'message': msg,
-      })
+      abort(404, msg)
 
     selection = []
     try:
@@ -291,15 +279,12 @@ def create_app(test_config=None):
       abort(422)
 
     if len(select_cat) == 0:
-      abort(404)
-      return jsonify({ #TODOAQ: return with abort instead?
-        'success': False,
-        'error': 404,
-        'message': 'Category "{}" (id={}) not found in the database!'.format(
-          quiz_category['type'],
-          quiz_category['id'],
-        ),
-      })
+      msg = 'Category "{}" (id={}) not found in the database!'.format(
+        quiz_category['type'],
+        quiz_category['id'],
+      )
+      abort(404, msg)
+
 
     allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
     allowed_questions_cnt =len(select_cat)
@@ -328,22 +313,26 @@ def create_app(test_config=None):
   '''
   @app.errorhandler(404)
   def not_found(error):
+    default_msg = "resource not found in the server's database"
+    message = error.description if len(error.description) else default_msg
     return (
       jsonify({
         'success': False,
         'error': 404,
-        'message': "resource not found in the server's database"
+        'message': message
       }),
       404,
     )
   
   @app.errorhandler(422)
   def unprocessable_entity(error):
+    default_msg = "your request is correctly formated but the server is unable to process it"
+    message = error.description if len(error.description) else default_msg
     return (
       jsonify({
         'success': False,
         'error': 422,
-        'message': "unprocessable entity - your request is correctly formated but the server is unable to process it"
+        'message': f"unprocessable entity - {message}"
       }),
       422,
     )
