@@ -170,7 +170,6 @@ class QuizView extends Component {
         )
   }
 
-
   render() {
     return this.state.quizCategory
         ? this.renderPlay()

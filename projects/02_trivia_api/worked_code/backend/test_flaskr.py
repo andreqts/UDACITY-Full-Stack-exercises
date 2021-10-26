@@ -12,7 +12,6 @@ QUESTIONS_PER_PAGE = 10
 QUESTIONS_TOTAL = 19
 
 
-
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
@@ -77,10 +76,6 @@ class TriviaTestCase(unittest.TestCase):
         #         print(sys.exc_info())
         #         abort(500)
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
     def test_get_first_page_of_questions(self):
         res = self.client().get("/questions")
         data = json.loads(res.data)
