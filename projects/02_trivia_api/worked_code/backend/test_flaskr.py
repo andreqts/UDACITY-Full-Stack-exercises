@@ -77,7 +77,7 @@ class TriviaTestCase(unittest.TestCase):
         #         abort(500)
 
     def test_get_first_page_of_questions(self):
-        res = self.client().get("/questions")
+        res = self.client().get("/api/v1.0/questions")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -86,7 +86,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data["questions"]) == QUESTIONS_PER_PAGE)
 
     def test_get_page_1_of_questions(self):
-        res = self.client().get("/questions?page=1")
+        res = self.client().get("/api/v1.0/questions?page=1")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -95,7 +95,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data["questions"]) == QUESTIONS_PER_PAGE)
 
     def test_get_page_2_of_questions(self):
-        res = self.client().get("/questions?page=2")
+        res = self.client().get("/api/v1.0/questions?page=2")
         data = json.loads(res.data)
 
         QUESTIONS_PAGE2 = QUESTIONS_TOTAL - QUESTIONS_PER_PAGE
@@ -110,7 +110,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_questions_by_category(self):
         CATEGORY_TO_SEARCH = 2
-        res = self.client().get("/categories/{}/questions".format(
+        res = self.client().get("/api/v1.0/categories/{}/questions".format(
                 CATEGORY_TO_SEARCH,
             ))
         EXPECTED_TOTAL_QUESTIONS = 4
@@ -123,7 +123,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_404_get_questions_of_nonexistent_category(self):
         CATEGORY_TO_SEARCH = 1000
-        res = self.client().get("/categories/{}/questions".format(
+        res = self.client().get("/api/v1.0/categories/{}/questions".format(
                 CATEGORY_TO_SEARCH,
             ))
         data = json.loads(res.data)
@@ -133,7 +133,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_404_get_nonexistant_page_of_questions(self):
         nonexistent_page = 1000
-        res = self.client().get("/questions?page={}".format(nonexistent_page))
+        res = self.client().get("/api/v1.0/questions?page={}".format(nonexistent_page))
         data = json.loads(res.data)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["error"], 404)        
@@ -144,7 +144,7 @@ class TriviaTestCase(unittest.TestCase):
 
         prev_total = len(Question.query.all())
        
-        res = self.client().delete(f"/questions/{question_id}")
+        res = self.client().delete(f"/api/v1.0/questions/{question_id}")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -162,7 +162,7 @@ class TriviaTestCase(unittest.TestCase):
 
         prev_total = len(Question.query.all())
         
-        res = self.client().post(f"/questions", json=self.new_question)
+        res = self.client().post(f"/api/v1.0/questions", json=self.new_question)
         data = json.loads(res.data)
 
         data = json.loads(res.data)
@@ -171,7 +171,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["total_questions"], prev_total + 1)
 
     def test_get_categories(self):
-        res = self.client().get("/categories")
+        res = self.client().get("/api/v1.0/categories")
         data = json.loads(res.data)
 
         CATEGORIES_TOTAL = 6
@@ -186,7 +186,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_search_questions(self):
         search_term = 'the'
-        res = self.client().post("/questions/search", json={ 'searchTerm': search_term })
+        res = self.client().post("/api/v1.0/questions/search", json={ 'searchTerm': search_term })
         data = json.loads(res.data)
         EXPECTED_TOTAL_MIN = 10
 
@@ -203,7 +203,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["total_questions"], len(Question.query.all()))
 
     def test_quizz(self):
-        res = self.client().post("/quizzes", json={
+        res = self.client().post("/api/v1.0/quizzes", json={
                 'previous_questions': [ 9, 12, 23, 24 ], 
                 'quiz_category': { 'id': 4, 'type': 'History' },
             })
@@ -214,7 +214,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category']['type'], 'History')
 
     def test_quiz_all_categories(self):
-        res = self.client().post("/quizzes", json={
+        res = self.client().post("/api/v1.0/quizzes", json={
                 'previous_questions': [ 9, 12, 23, 24 ], 
                 'quiz_category': { 'id': 0, 'type': 'All' },
             })
@@ -226,7 +226,7 @@ class TriviaTestCase(unittest.TestCase):
 
 
     def test_error_404_quizz_with_nonexistent_category(self):
-        res = self.client().post("/quizzes", json={
+        res = self.client().post("/api/v1.0/quizzes", json={
                 'previous_questions': [ 9, 12, 23, 24 ], 
                 'quiz_category': { 'id': 1000, 'type': 'Nonexistent' },
             })

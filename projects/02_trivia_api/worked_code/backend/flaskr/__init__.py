@@ -48,7 +48,7 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-  @app.route('/questions')
+  @app.route('/api/v1.0/questions')
   def get_questions():
     selection = Question.query.order_by(Question.id).all()
     current_questions = get_paginated_questions(request, selection)
@@ -70,7 +70,7 @@ def create_app(test_config=None):
           'success': True,
     })
 
-  @app.route('/questions/<int:question_id>', methods = ['DELETE'])
+  @app.route('/api/v1.0/questions/<int:question_id>', methods = ['DELETE'])
   def delete_question(question_id):
     try:
       question = Question.query.filter_by(id=question_id).one_or_none()
@@ -95,7 +95,7 @@ def create_app(test_config=None):
     except:
         abort(422)
 
-  @app.route('/questions', methods=['POST'])
+  @app.route('/api/v1.0/questions', methods=['POST'])
   def add_question():
     body = request.get_json()
 
@@ -120,7 +120,7 @@ def create_app(test_config=None):
       abort(422)
 
   
-  @app.route('/categories')
+  @app.route('/api/v1.0/categories')
   def get_categories():
     try:
       selection = Category.query.all()
@@ -137,7 +137,7 @@ def create_app(test_config=None):
       abort(422)
   
   
-  @app.route('/categories/<int:cat_id>/questions')
+  @app.route('/api/v1.0/categories/<int:cat_id>/questions')
   def get_questions_by_category(cat_id):
     category = []
     try:
@@ -169,7 +169,7 @@ def create_app(test_config=None):
       'current_category': category.type,
     })
 
-  @app.route('/questions/search', methods=['POST'])
+  @app.route('/api/v1.0/questions/search', methods=['POST'])
   def search_venues():
     try:
       body = request.get_json()
@@ -187,7 +187,7 @@ def create_app(test_config=None):
       'current_category': '',
     })
   
-  @app.route('/quizzes', methods=['POST'])
+  @app.route('/api/v1.0/quizzes', methods=['POST'])
   def get_quizzes():
     body = request.get_json()
     prev_question = body.get('previous_questions', '')
