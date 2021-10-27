@@ -43,17 +43,59 @@ The `--reload` flag will detect file changes and restart the server automaticall
 ## Resource endpoint library
 
 The documentation of the backend application endpoints are described below:
+
+### Endpoints
+
+```js
+GET '/categories'
+- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+- Request Parameters: None
+- Returns: A JSON object with a single key, categories, that contains an object of id: category_string key:value pairs. 
+{
+    'categories': { '1' : "Science",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
+    '6' : "Sports" }
+    'total_categories': total number of categories,
+    'success': True,
+}
 ```
-Endpoints
-GET '/api/v1.0/categories'
-GET '/api/v1.0/questions'
+
+```js
+GET '/questions?page=${integer}'
+- Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories and current category string. 
+- Request Parameters: page - integer
+- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, and current category string
+{
+    'questions': [
+        {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 2
+        },
+    ],
+    'total_questions': 100,
+    'categories': { '1' : "Science",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
+    '6' : "Sports" },
+    'current_category': 'History',
+    'success': True,
+}
+```
 
 
 ## Review Comment to the Students
-```
+
 This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
 
-Endpoints
+### Endpoints
 GET '/api/v1.0/categories'
 GET ...
 POST ...
