@@ -17,11 +17,11 @@ This application includes the following features:
 ## Getting Started
 
 The frontend application is implemented in React. All persistent data is stored in the backend server, in a Postgresql database. The backend server is implemented using Flask, in Python, and SQLAlchemy ORM.
-The frontend communicates asynchronously with the backend, using AJAX, through a well defined backend API, whose endpoints are documented in the [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory.
+The frontend communicates asynchronously with the backend, using AJAX, through a well-defined backend API, whose endpoints are documented in the [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory.
 The application was designed to be tested running in localhost. The **backend** runs by default on **TCP port 5000**, while the **frontend** runs on **TCP port 3000**.
 Data exchanged between the frontend and backend applications is always in **JSON format**.
-Test codes are provided in Python for the backend, and in React for the frontend, covering all essential functionality.
-For the backend, unit tests cover every endpoints and its most likely possible error handling.
+Test codes are provided in Python for the backend and React for the frontend, covering all essential functionality.
+For the backend, unit tests cover every endpoint and its most likely possible error handling.
 
 ### Installation
 
@@ -38,13 +38,13 @@ To be able to run this application locally, you can proceed with the following s
 ### Running tests
 
 After installation, you can run the complete **backend test suite** from the `/backend` folder, by running: `python test_flaskr.py`.
-To execute the **front end** test suite, to to the `/frontend` folder and run `npm test`.
+To execute the **front end** test suite, go to the `/frontend` folder and run `npm test`.
 
-To test the responde of the backend, you can use the [curl command line tool](https://curl.se/). For instance, if you what to get the first page of the whole list of questions (the return is paginated with 10 questions per page), having the flask backend app running, you can run from the command line:
+To test the response of the backend, you can use the [curl command line tool](https://curl.se/). For instance, if you what to get the first page of the whole list of questions (the return is paginated with 10 questions per page), having the flask backend app running, you can run from the command line:
 
 `curl -XGET localhost:5000/questions`
 
-The command above must return the first page of questions, with 10 questions' objects formated as JSON.
+The command above must return the first page of questions, with 10 questions' objects formatted as JSON.
 
 ## About the Stack
 
@@ -56,20 +56,11 @@ The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_a
 
 ### Frontend
 
-The [./frontend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server. If you have prior experience building a frontend application, you should feel free to edit the endpoints as you see fit for the backend you design. If you do not have prior experience building a frontend application, you should read through the frontend code before starting and make notes regarding:
-
-1. What are the end points and HTTP methods the frontend is expecting to consume?
-2. How are the requests from the frontend formatted? Are they expecting certain parameters or payloads? 
-
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. The places where you may change the frontend behavior, and where you should be looking for the above information, are marked with `TODO`. These are the files you'd want to edit in the frontend:
+The [./frontend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server.
+These are the files you may want to check:
 
 1. *./frontend/src/components/QuestionView.js*
 2. *./frontend/src/components/FormView.js*
 3. *./frontend/src/components/QuizView.js*
-
-
-By making notes ahead of time, you will practice the core skill of being able to read and understand code and will have a simple plan to follow to build out the endpoints of your backend API. 
-
-
 
 >View the [README within ./frontend for more details.](./frontend/README.md)
