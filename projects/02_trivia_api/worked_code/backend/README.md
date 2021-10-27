@@ -40,6 +40,15 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
+## Resource endpoint library
+
+The documentation of the backend application endpoints are described below:
+```
+Endpoints
+GET '/api/v1.0/categories'
+GET '/api/v1.0/questions'
+
+
 ## Review Comment to the Students
 ```
 This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
