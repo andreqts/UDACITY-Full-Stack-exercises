@@ -1,9 +1,10 @@
 # Full Stack API Final Project
 
+## Introduction
 
-## Full Stack Trivia
+### Full Stack Trivia
 
-Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game.
+Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game. The backend API, which makes the interface with the database, was left to the students to complete. Here I present my version of the game with my backend, including some small changes to the React frontend as well.
 
 This application includes the following features:
 
@@ -13,7 +14,13 @@ This application includes the following features:
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
-## Installation
+## Getting Started
+
+The frontend application is implemented in React. All persistent data is stored in the backend server, in a Postgresql database. The backend server is implemented using Flask, in Python, and SQLAlchemy ORM.
+The frontend communicates asynchronously with the backend, using AJAX, through a well defined backend API, whose endpoints are described below.
+The application was designed to run in localhost. The **backend** runs by default on **TCP port 5000**, while the **frontend** runs on **TCP port 3000**.
+
+### Installation
 
 To be able to run this application locally, you can proceed with the following steps:
 1. Fork this repo
