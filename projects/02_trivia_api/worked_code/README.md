@@ -17,8 +17,10 @@ This application includes the following features:
 ## Getting Started
 
 The frontend application is implemented in React. All persistent data is stored in the backend server, in a Postgresql database. The backend server is implemented using Flask, in Python, and SQLAlchemy ORM.
-The frontend communicates asynchronously with the backend, using AJAX, through a well defined backend API, whose endpoints are described below.
-The application was designed to run in localhost. The **backend** runs by default on **TCP port 5000**, while the **frontend** runs on **TCP port 3000**.
+The frontend communicates asynchronously with the backend, using AJAX, through a well defined backend API, whose endpoints are documented below.
+The application was designed to be tested running in localhost. The **backend** runs by default on **TCP port 5000**, while the **frontend** runs on **TCP port 3000**.
+Test codes are provided in Python for the backend, and in React for the frontend, covering all essential functionality.
+For the backend, unit tests cover every endpoints and its most likely possible error handling.
 
 ### Installation
 
@@ -32,15 +34,19 @@ To be able to run this application locally, you can proceed with the following s
 6. Go to the backend folder and start the backend application with the following command: `flask run`.
 7. Go to the frontend folder and start the frontend application by running the following command: `npm start`.
 
+### Running tests
+
+After installation, you can run the complete **backend test suite** from the `/backend` folder, by running: `python test_flaskr.py`.
+To execute the **front end** test suite, to to the `/frontend` folder and run `npm test`.
+
+To test the responde of the backend, you can use the [curl command line tool](https://curl.se/). For instance, if you what to get the first page of the whole list of questions (the return is paginated with 10 questions per page), having the flask backend app running, you can run from the command line: `curl -XGET localhost:5000/questions` 
+
 ## About the Stack
 
 This full stack application is designed with some key functional areas:
 
 ### Backend
 The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory contains a complete Flask and SQLAlchemy server. The file `__init__.py` defines the backend endpoints and can reference models.py for DB and SQLAlchemy setup.
-
-
-
 
 ### Frontend
 
