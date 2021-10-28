@@ -17,7 +17,7 @@ This application includes the following features:
 ## Getting Started
 
 The frontend application is implemented in React. All persistent data is stored in the backend server, in a Postgresql database. The backend server is implemented using Flask, in Python, and SQLAlchemy ORM.
-The frontend communicates asynchronously with the backend, using AJAX, through a well-defined backend API, whose endpoints are documented in the [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory.
+The frontend communicates asynchronously with the backend, using AJAX, through a well-defined backend API, whose endpoints are documented in the [./backend](https://github.com/andreqts/UDACITY-Full-Stack-exercises/blob/main/projects/02_trivia_api/worked_code/backend/README.md) directory.
 The application was designed to be tested running in localhost. The **backend** runs by default on **TCP port 5000**, while the **frontend** runs on **TCP port 3000**.
 Data exchanged between the frontend and backend applications is always in **JSON format**.
 Test codes are provided in Python for the backend and React for the frontend, covering all essential functionality.
@@ -52,15 +52,15 @@ This full stack application is designed with some key functional areas:
 
 ### Backend
 
-The [./backend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/backend/README.md) directory contains a complete Flask and SQLAlchemy server. The file `__init__.py` defines the backend endpoints and can reference models.py for DB and SQLAlchemy setup.
+The [./backend](https://github.com/andreqts/UDACITY-Full-Stack-exercises/blob/main/projects/02_trivia_api/worked_code/backend/README.md) directory contains a complete Flask and SQLAlchemy server. The file `__init__.py` defines the backend endpoints and can reference models.py for DB and SQLAlchemy setup.
 
 ### Frontend
 
-The [./frontend](https://github.com/udacity/FSND/blob/master/projects/02_trivia_api/starter/frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server.
+The [./frontend](https://github.com/andreqts/UDACITY-Full-Stack-exercises/blob/main/projects/02_trivia_api/worked_code/frontend/README.md) directory contains a complete React frontend to consume the data from the Flask server.
 These are the files you may want to check:
 
 1. *./frontend/src/components/QuestionView.js*
 2. *./frontend/src/components/FormView.js*
 3. *./frontend/src/components/QuizView.js*
 
->View the [README within ./frontend for more details.](./frontend/README.md)
+>View the [README within ./frontend for more details.](https://github.com/andreqts/UDACITY-Full-Stack-exercises/blob/main/projects/02_trivia_api/worked_code/frontend/README.md)
