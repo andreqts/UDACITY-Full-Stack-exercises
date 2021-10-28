@@ -168,7 +168,7 @@ or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }.
 
 The following errors may be returned by the above endpoints:
 
-##TODO:##
+**TODO:**
 
 ## Testing
 To run the tests, run
