@@ -209,9 +209,12 @@ class TriviaTestCase(unittest.TestCase):
             })
         data = json.loads(res.data)
 
+        total_hist_questions = len(Question.query.filter_by(category=4).all())
+
         self.assertTrue(data["success"])
         self.assertEqual(data['question']['id'], 5)
         self.assertEqual(data['current_category']['type'], 'History')
+        self.assertEqual(data['total_quizz_questions'], total_hist_questions)
 
     def test_quiz_all_categories(self):
         res = self.client().post("/api/v1.0/quizzes", json={
@@ -220,9 +223,12 @@ class TriviaTestCase(unittest.TestCase):
             })
         data = json.loads(res.data)
 
+        total_hist_questions = len(Question.query.all())
+
         self.assertTrue(data["success"])
         self.assertTrue(data['question']['id'] > 0)
         self.assertEqual(data['current_category']['type'], 'All')
+        self.assertEqual(data['total_quizz_questions'], total_hist_questions)
 
 
     def test_error_404_quizz_with_nonexistent_category(self):

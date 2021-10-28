@@ -229,6 +229,7 @@ def create_app(test_config=None):
       'success': True,
       'question': next_question,
       'current_category': quiz_category,
+      'total_quizz_questions': allowed_questions_cnt,
     })
 
   @app.errorhandler(404)
