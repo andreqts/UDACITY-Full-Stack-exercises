@@ -43,35 +43,132 @@ The `--reload` flag will detect file changes and restart the server automaticall
 ## Resource endpoint library
 
 The documentation of the backend application endpoints are described below:
-```
-Endpoints
-GET '/api/v1.0/categories'
-GET '/api/v1.0/questions'
 
+### Endpoints
 
-## Review Comment to the Students
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
-GET '/api/v1.0/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/api/v1.0/categories'
+```js
+GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
+- Request Parameters: None
+- Returns: A JSON object with a single key, categories, that contains an object of id: category_string key:value pairs. 
+{
+    'categories': { '1' : "Science",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
+    '6' : "Sports" }
+    'total_categories': total number of categories,
+    'success': True,
+}
 ```
 
+```js
+GET '/questions?page=<page>
+- Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories
+and current category string. 
+- Request Parameters: page - integer indicating the page to be returned
+- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, a current category
+string, and a success key indicating no error has occurred.
+{
+    'questions': [
+        {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 2
+        },
+        ...
+    ],
+    'total_questions': 100,
+    'categories': { '1' : "Science",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
+    '6' : "Sports" },
+    'current_category': 'History',
+    'success': True,
+}
+```
+
+
+```js
+GET /api/v1.0/categories/<cat_id>/questions
+- Fetches a dictionary of questions from a specific category
+- Request Parameters: cat_id - integer value indicating category id of the questions to be returned
+- Returns: A JSON object with the categories key, that contains an object of id: category_string key:value pairs, 
+plus a total_categories key, with the total number of stored categories, and a boolean success key, indicating the 
+operation have not failed.
+{
+    'questions':[
+        {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 4 //supposing cat_id = 4
+        },
+        ...
+    ]
+    'total_questions': total number of questions,
+    'current_category': 'History',
+    'success': True,
+}
+```
+
+
+```js
+POST /api/v1.0/questions/search
+- Fetches a dictionary of questions matching a given search term
+- Request Parameters: search_term - string to search in the question field of the question objects. The search is
+case insensitive.
+- Returns: A JSON object with the questions key, that contains an array of question objects which question field matches
+the search_term, the total number of categories and a boolean success field that is true if there was no erros.
+{
+    'questions': [  {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 2
+        },
+    'total_categories': total number of categories,
+    'success': True,
+}
+```
+
+
+```js
+POST /api/v1.0/quizzes
+- Fetches a random question of the defined categories to the quizz play, that is not inside the previous questions array
+- Request Parameters:
+    1. <previous_questions> - array with a list of integer questions' ids of questions that cannot be returned.
+    2. <quiz_category> - JSON object with keys id and type, containing respectively the integer id and the string 
+    description of the category of the question to be returned, or { 'id': 0, 'type': 'All' } in case any category
+    can be returned.
+- Returns: A JSON object with the questions key, that contains the random question object of the specified category,
+or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }.
+{
+    'question': [  {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 4 //supposing History category has been requested
+        },
+    'current_category': { 'id': 4, 'type': 'History' },
+    'success': True,
+}
+```
+
+
+## Error Handling
+
+The following errors may be returned by the above endpoints:
+
+**TODO:**
 
 ## Testing
 To run the tests, run
