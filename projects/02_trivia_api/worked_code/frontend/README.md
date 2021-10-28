@@ -28,29 +28,12 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser. T
 npm start
 ```
 
-### Request Formatting
+### Game Play Mechanics Improvements
 
-The frontend should be fairly straightforward and disgestible. You'll primarily work within the ```components``` folder in order to understand, and if you so choose edit, the endpoints utilized by the components. While working on your backend request handling and response formatting, you can reference the frontend to view how it parses the responses. 
+In the UDACITY starting scratch code, when a user played the game they played up to five questions of the chosen category. If there were fewer than five questions in a category, the game would end suddenly when there are no more questions in that category.
 
-After you complete your endpoints, ensure you return to the frontend to confirm your API handles requests and responses appropriately: 
-- Endpoints defined as expected by the frontend
-- Response body provided as expected by the frontend 
-
-### Optional: Updating Endpoints and API behavior
-
-Would you rather the API had different behavior - different endpoints, return the response body in a different format? Go for it! Make the updates to your API and the corresponding updates to the frontend so it works with your API seamlessly. 
-
-
-### Optional: Styling
-
-In addition, you may want to customize and style the frontend by editing the CSS in the ```stylesheets``` folder. 
-
-### Optional: Game Play Mechanics
-
-Currently, when a user plays the game they play up to five questions of the chosen category. If there are fewer than five questions in a category, the game will end when there are no more questions in that category. 
-
-You can optionally update this game play to increase the number of questions or whatever other game mechanics you decide. Make sure to specify the new mechanics of the game in the README of the repo you submit so the reviewers are aware that the behavior is correct. 
-
+The game play mechanics have been improved to inform the player on the maximum number of questions in each play, considering the maximum number of questions of the selected category in the database.
+The frontend has also been improved to inform the user about his/her score during the play.
 
 
 >**Spoiler Alert:** If needed, there are details below regarding the expected endpoints and behavior. But, ONLY consult there if necessary, so you give yourself the opportunity to practice understanding code!
