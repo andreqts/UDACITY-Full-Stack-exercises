@@ -120,7 +120,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data["questions"]), EXPECTED_TOTAL_QUESTIONS)
         self.assertEqual(data["current_category"], "Art")
 
-
     def test_404_get_questions_of_nonexistent_category(self):
         CATEGORY_TO_SEARCH = 1000
         res = self.client().get("/api/v1.0/categories/{}/questions".format(

@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random as rnd
+from werkzeug.exceptions import HTTPException
 
 from models import setup_db, Question, Category
 from sqlalchemy.sql.expression import null
@@ -20,7 +21,7 @@ def get_paginated_questions(request, selection):
 
   return current_questions
 
-
+ 
 def categories_to_dict(categories_selection):
   categories = [cat.format() for cat in categories_selection]
 
@@ -50,25 +51,31 @@ def create_app(test_config=None):
 
   @app.route('/api/v1.0/questions')
   def get_questions():
-    selection = Question.query.order_by(Question.id).all()
-    current_questions = get_paginated_questions(request, selection)
+    try:
+      selection = Question.query.order_by(Question.id).all()
+      current_questions = get_paginated_questions(request, selection)
 
-    if len(current_questions) == 0:
-          page = request.args.get('page', 1, type=int)
-          msg = f'Page {page} not found in the database'
-          abort(404, msg)
-  
-    #with_entities returns the fields in a tuple
-    categories_selection = Category.query.order_by(Category.id).all()
-    categories_dict = categories_to_dict(categories_selection)
+      if len(current_questions) == 0:
+        page = request.args.get('page', 1, type=int)
+        msg = f'Page {page} not found in the database'
+        abort(404, msg)
+    
+      #with_entities returns the fields in a tuple
+      categories_selection = Category.query.order_by(Category.id).all()
+      categories_dict = categories_to_dict(categories_selection)
 
-    return jsonify({
-          'questions': current_questions,
-          'total_questions': len(Question.query.all()),
-          'categories': categories_dict,
-          'current_category': '',
-          'success': True,
-    })
+      return jsonify({
+            'questions': current_questions,
+            'total_questions': len(Question.query.all()),
+            'categories': categories_dict,
+            'current_category': '',
+            'success': True,
+      })
+    except HTTPException:
+      raise
+    except:
+      abort(422, sys.exc_info())
+    
 
   @app.route('/api/v1.0/questions/<int:question_id>', methods = ['DELETE'])
   def delete_question(question_id):
@@ -91,20 +98,20 @@ def create_app(test_config=None):
         }
       )
     except HTTPException:
-        raise
+      raise
     except:
-        abort(422)
+      abort(422, sys.exc_info())
 
   @app.route('/api/v1.0/questions', methods=['POST'])
   def add_question():
-    body = request.get_json()
-
-    new_question = body.get('question', '')
-    new_answer = body.get('answer', '')
-    new_difficulty = body.get('difficulty', 0)
-    new_category = body.get('category', 0)
-
     try:
+      body = request.get_json()
+
+      new_question = body.get('question', '')
+      new_answer = body.get('answer', '')
+      new_difficulty = body.get('difficulty', 0)
+      new_category = body.get('category', 0)
+
       question = Question(question=new_question, answer=new_answer, difficulty=new_difficulty, category=new_category)
       question.insert()
 
@@ -115,11 +122,11 @@ def create_app(test_config=None):
         'created_id': question.id,
         'total_questions': len(selection),
       })
-
+    except HTTPException:
+      raise
     except:
-      abort(422)
+      abort(422, sys.exc_info())
 
-  
   @app.route('/api/v1.0/categories')
   def get_categories():
     try:
@@ -133,8 +140,10 @@ def create_app(test_config=None):
         'total_categories': len(selection),
       })
 
+    except HTTPException:
+      raise
     except:
-      abort(422)
+      abort(422, sys.exc_info())
   
   
   @app.route('/api/v1.0/categories/<int:cat_id>/questions')
@@ -142,32 +151,28 @@ def create_app(test_config=None):
     category = []
     try:
       category = Category.query.get(cat_id)
-    except:
-      abort(422)
 
-    if (category is None):
-      msg = f'Category {cat_id} not found in the database'
-      abort(404, msg)
+      if (category is None):
+        msg = f'Category {cat_id} not found in the database'
+        abort(404, msg)
 
-    selection = []
-    try:
       selection = Question.query.filter_by(category=cat_id).all()
 
       total_questions = len(selection)
       assert(total_questions <= QUESTIONS_PER_PAGE)
-    except HTTPException:
-        raise
-    except:
-        abort(422)
-     
-    questions = [question.format() for question in selection]
+      
+      questions = [question.format() for question in selection]
 
-    return jsonify({
-      'success': True,
-      'questions': questions,
-      'total_questions': len(Question.query.all()),
-      'current_category': category.type,
-    })
+      return jsonify({
+        'success': True,
+        'questions': questions,
+        'total_questions': len(Question.query.all()),
+        'current_category': category.type,
+      })
+    except HTTPException:
+      raise
+    except:
+      abort(422, sys.exc_info())
 
   @app.route('/api/v1.0/questions/search', methods=['POST'])
   def search_venues():
@@ -176,62 +181,66 @@ def create_app(test_config=None):
       str_to_search = body.get('searchTerm', '')
       selection = Question.query.filter(Question.question.ilike(f'%{str_to_search}%')).all()
       questions_found = [question.format() for question in selection]
-    except:
-      print(sys.exc_info())
-      abort(422)
 
-    return jsonify({
-      'success': True,
-      'questions': questions_found,
-      'total_questions': len(Question.query.all()),
-      'current_category': '',
-    })
+      return jsonify({
+        'success': True,
+        'questions': questions_found,
+        'total_questions': len(Question.query.all()),
+        'current_category': '',
+      })
+    except HTTPException:
+      raise
+    except:
+      abort(422, sys.exc_info())
   
   @app.route('/api/v1.0/quizzes', methods=['POST'])
   def get_quizzes():
-    body = request.get_json()
-    prev_question = body.get('previous_questions', '')
-    quiz_category = body.get('quiz_category', '')
-
-    select_cat = None
     try:
+      body = request.get_json()
+      prev_question = body.get('previous_questions', '')
+      quiz_category = body.get('quiz_category', '')
+
+      select_cat = None
+
       if quiz_category['id'] == 0: # All categories
         select_cat = Question.query.all()
       else:
         select_cat = Question.query.filter_by(category=quiz_category['id']).all()
+
+      if len(select_cat) == 0:
+        msg = 'Category "{}" (id={}) not found in the database!'.format(
+          quiz_category['type'],
+          quiz_category['id'],
+        )
+        abort(404, msg)
+
+
+      allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
+      allowed_questions_cnt =len(select_cat)
+
+      if allowed_questions_cnt > 0:
+        rnd.shuffle(allowed_questions)
+
+        chosen_question = null
+        for q in allowed_questions:
+          if q.id not in prev_question:
+            chosen_question = q
+            break
+
+      next_question = chosen_question.format() if chosen_question != null else ''
+    
+      return jsonify({
+        'success': True,
+        'question': next_question,
+        'current_category': quiz_category,
+        'total_quizz_questions': allowed_questions_cnt,
+      })
+    except HTTPException:
+      raise
     except:
-      print(sys.exc_info())
-      abort(422)
+      abort(422, sys.exc_info())
 
-    if len(select_cat) == 0:
-      msg = 'Category "{}" (id={}) not found in the database!'.format(
-        quiz_category['type'],
-        quiz_category['id'],
-      )
-      abort(404, msg)
-
-
-    allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
-    allowed_questions_cnt =len(select_cat)
-
-    if allowed_questions_cnt > 0:
-      rnd.shuffle(allowed_questions)
-
-      chosen_question = null
-      for q in allowed_questions:
-        if q.id not in prev_question:
-          chosen_question = q
-          break
-
-    next_question = chosen_question.format() if chosen_question != null else ''
-  
-    return jsonify({
-      'success': True,
-      'question': next_question,
-      'current_category': quiz_category,
-      'total_quizz_questions': allowed_questions_cnt,
-    })
-
+  # DEFAULT ERROR HANDLERS
   @app.errorhandler(404)
   def not_found(error):
     default_msg = "resource not found in the server's database"
@@ -257,6 +266,21 @@ def create_app(test_config=None):
       }),
       422,
     )
+
+  @app.errorhandler(HTTPException)
+  def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    return (
+    jsonify({
+      'success': False,
+      'error': e.code,
+      'message': f'{e.name}: {e.description}'
+    }),
+    e.code,
+  )
 
   return app
 
