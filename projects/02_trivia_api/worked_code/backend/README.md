@@ -67,7 +67,7 @@ GET '/categories'
 GET '/questions?page=${integer}'
 - Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories and current category string. 
 - Request Parameters: page - integer
-- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, and current category string
+- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, a current category string, and a success key indicating no error has occurred.
 {
     'questions': [
         {
@@ -86,6 +86,24 @@ GET '/questions?page=${integer}'
     '5' : "Entertainment",
     '6' : "Sports" },
     'current_category': 'History',
+    'success': True,
+}
+```
+
+
+```js
+GET /api/v1.0/categories/${cat_id}/questions
+- Fetches a dictionary of questions from a specific category
+- Request Parameters: cat_id - category id of the questions to be returned
+- Returns: A JSON object with the categories key, that contains an object of id: category_string key:value pairs, plus a total_categories key, with the total number of stored categories, and a boolean success key, indicating the operation have not failed.
+{
+    'categories': { '1' : "Science",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
+    '6' : "Sports" }
+    'total_categories': total number of categories,
     'success': True,
 }
 ```
