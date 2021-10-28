@@ -244,5 +244,9 @@ class TriviaTestCase(unittest.TestCase):
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
-    subprocess.call('./inittestdb.sh') # resets de database (does not work in setUp)
+    # the line below uses a shell script to reset the database automatically
+    # It works if used here, but I could not make it work in setUp and tearDown, 
+    # to effectively make unit tests independent.
+    # subprocess.call('./inittestdb.sh') # resets de database (does not work in setUp)
+
     unittest.main()
