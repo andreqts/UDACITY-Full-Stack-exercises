@@ -3,13 +3,14 @@ import $ from 'jquery';
 
 import '../stylesheets/QuizView.css';
 
-const questionsPerPlay = 5;
+const defaultQuestionsPerPlay = 5;
 
 class QuizView extends Component {
   constructor(props){
     super();
     this.state = {
         quizCategory: null,
+        total_quiz_questions: defaultQuestionsPerPlay,
         previousQuestions: [], 
         showAnswer: false,
         categories: {},
@@ -66,6 +67,7 @@ class QuizView extends Component {
           showAnswer: false,
           previousQuestions: previousQuestions,
           currentQuestion: result.question,
+          total_quiz_questions: (result.total_quizz_questions < defaultQuestionsPerPlay) ? result.total_quizz_questions : defaultQuestionsPerPlay,
           guess: '',
           forceEnd: result.question ? false : true
         })
@@ -153,7 +155,7 @@ class QuizView extends Component {
   }
 
   renderPlay(){
-    return this.state.previousQuestions.length === questionsPerPlay || this.state.forceEnd
+    return this.state.previousQuestions.length === this.state.total_quiz_questions || this.state.forceEnd
       ? this.renderFinalScore()
       : this.state.showAnswer 
         ? this.renderCorrectAnswer()
@@ -164,7 +166,7 @@ class QuizView extends Component {
               <input type="text" name="guess" onChange={this.handleChange}/>
               <input className="submit-guess button" type="submit" value="Submit Answer" />
             </form>
-            <p>Question {this.state.previousQuestions.length} from a maximum of {questionsPerPlay}</p>
+            <p>Question {this.state.previousQuestions.length} from a maximum of {this.state.total_quiz_questions}</p>
             <p>You've got {this.state.numCorrect} questions right so far</p>
           </div>
         )
