@@ -65,9 +65,11 @@ GET '/categories'
 
 ```js
 GET '/questions?page=<page>
-- Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories and current category string. 
+- Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories
+and current category string. 
 - Request Parameters: page - integer indicating the page to be returned
-- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, a current category string, and a success key indicating no error has occurred.
+- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, a current category
+string, and a success key indicating no error has occurred.
 {
     'questions': [
         {
@@ -96,7 +98,9 @@ GET '/questions?page=<page>
 GET /api/v1.0/categories/<cat_id>/questions
 - Fetches a dictionary of questions from a specific category
 - Request Parameters: cat_id - integer value indicating category id of the questions to be returned
-- Returns: A JSON object with the categories key, that contains an object of id: category_string key:value pairs, plus a total_categories key, with the total number of stored categories, and a boolean success key, indicating the operation have not failed.
+- Returns: A JSON object with the categories key, that contains an object of id: category_string key:value pairs, 
+plus a total_categories key, with the total number of stored categories, and a boolean success key, indicating the 
+operation have not failed.
 {
     'questions':[
         {
@@ -118,8 +122,10 @@ GET /api/v1.0/categories/<cat_id>/questions
 ```js
 POST /api/v1.0/questions/search
 - Fetches a dictionary of questions matching a given search term
-- Request Parameters: search_term - string to search in the question field of the question objects. The search is case insensitive.
-- Returns: A JSON object with the questions key, that contains an array of question objects which question field matches the search_term, the total number of categories and a boolean success field that is true if there was no erros.
+- Request Parameters: search_term - string to search in the question field of the question objects. The search is
+case insensitive.
+- Returns: A JSON object with the questions key, that contains an array of question objects which question field matches
+the search_term, the total number of categories and a boolean success field that is true if there was no erros.
 {
     'questions': [  {
             'id': 1,
@@ -129,6 +135,30 @@ POST /api/v1.0/questions/search
             'category': 2
         },
     'total_categories': total number of categories,
+    'success': True,
+}
+```
+
+
+```js
+POST /api/v1.0/quizzes
+- Fetches a random question of the defined categories to the quizz play, that is not inside the previous questions array
+- Request Parameters:
+    1. <previous_questions> - array with a list of integer questions' ids of questions that cannot be returned.
+    2. <quiz_category> - JSON object with keys id and type, containing respectively the integer id and the string 
+    description of the category of the question to be returned, or { 'id': 0, 'type': 'All' } in case any category
+    can be returned.
+- Returns: A JSON object with the questions key, that contains the random question object of the specified category,
+or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }.
+{
+    'question': [  {
+            'id': 1,
+            'question': 'This is a question',
+            'answer': 'This is an answer', 
+            'difficulty': 5,
+            'category': 4 //supposing History category has been requested
+        },
+    'current_category': { 'id': 4, 'type': 'History' },
     'success': True,
 }
 ```
@@ -156,7 +186,6 @@ GET '/api/v1.0/categories'
 '6' : "Sports"}
 
 ```
-
 
 ## Testing
 To run the tests, run
