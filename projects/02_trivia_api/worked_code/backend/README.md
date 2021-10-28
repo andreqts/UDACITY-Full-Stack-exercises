@@ -149,7 +149,10 @@ POST /api/v1.0/quizzes
     description of the category of the question to be returned, or { 'id': 0, 'type': 'All' } in case any category
     can be returned.
 - Returns: A JSON object with the questions key, that contains the random question object of the specified category,
-or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }.
+or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }. The object representing the current
+category, used as a filter for the randomly selected question, and also the total_quizz_questions, an integer value
+that represents the total number of questions of the selected category (or categories) in the database.
+The boolean success field is True if no errors have occurred.
 {
     'question': [  {
             'id': 1,
@@ -159,6 +162,7 @@ or any category in case quiz_categories parameter is { 'id': 0, 'type': 'All' }.
             'category': 4 //supposing History category has been requested
         },
     'current_category': { 'id': 4, 'type': 'History' },
+    'total_quizz_questions': 4,
     'success': True,
 }
 ```
