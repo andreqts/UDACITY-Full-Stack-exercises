@@ -3,11 +3,11 @@ from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-database_name = "triviadb"
-db_username = 'student'
-db_userpassword = 'UdacityExercises21'
-db_host = 'localhost'
-db_host_port = 5432
+database_name = os.getenv('TRIVIA_DB_NAME')
+db_username = os.getenv('TRIVIA_DB_USER')
+db_userpassword = os.getenv('TRIVIA_DB_PASSWORD')
+db_host = os.getenv('TRIVIA_DB_HOST')
+db_host_port = os.getenv('TRIVIA_DB_HOST_PORT')
 
 database_path = "postgresql://{}{}{}@{}:{}/{}".format(
   db_username,

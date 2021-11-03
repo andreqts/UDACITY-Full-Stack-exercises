@@ -28,11 +28,11 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app(testConfig)
         self.client = self.app.test_client
 
-        database_name = "trivia_test"
-        db_username = 'student'
-        db_userpassword = 'UdacityExercises21'
-        db_host = 'localhost'
-        db_host_port = 5432
+        database_name = os.getenv('TRIVIA_DB_TEST_NAME')
+        db_username = os.getenv('TRIVIA_DB_TEST_USER')
+        db_userpassword = os.getenv('TRIVIA_DB_TEST_PASSWORD')
+        db_host = os.getenv('TRIVIA_DB_TEST_HOST')
+        db_host_port = os.getenv('TRIVIA_DB_TEST_HOST_PORT')
 
         self.database_path = "postgresql://{}{}{}@{}:{}/{}".format(
             db_username,
