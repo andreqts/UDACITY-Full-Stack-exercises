@@ -37,7 +37,7 @@ Before running the server, be sure to set the following environment variables:
 
 ```
 TRIVIA_DB_HOST=localhost
-TRIVIADB_NAME=triviadb
+TRIVIA_DB_NAME=triviadb
 TRIVIA_DB_USER=student
 TRIVIA_DB_PASSWORD=<your db password>
 TRIVIA_DB_HOST_PORT=5432
@@ -201,6 +201,19 @@ The following error codes may be returned by the above endpoints:
 3. **Others:** any other exception that may happen in the backend application or its components will be returned with appropriate information, in the format described above.
 
 ## Testing
+
+Before running the tests, be sure to set the following environment variables:
+
+```
+TRIVIA_DB_TEST_HOST=localhost
+TRIVIA_DB_TEST_NAME=trivia_test
+TRIVIA_DB_TEST_USER=student
+TRIVIA_DB_TEST_PASSWORD=<your test db password>
+TRIVIA_DB_TEST_HOST_PORT=5432
+```
+
+In order to correctly set the above required environment variables, please consult your operating system documentation (in Linux, for instance, you can use the **export** command in your `.bashrc` file).
+
 To run the tests, run
 ```
 dropdb trivia_test
