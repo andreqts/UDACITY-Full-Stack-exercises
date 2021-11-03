@@ -23,12 +23,27 @@ This will install all of the required packages we selected within the `requireme
  - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
 ### Database Setup
+
+The backend application uses a database named **triviadb** for its production instance, and another called **trivia_test** for its unit test suite.
+
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
 ```bash
 psql trivia < trivia.psql
 ```
 
 ### Running the server
+
+Before running the server, be sure to set the following environment variables:
+
+```
+TRIVIA_DB_HOST=localhost
+TRIVIADB_NAME=triviadb
+TRIVIA_DB_USER=student
+TRIVIA_DB_PASSWORD=<your db password>
+TRIVIA_DB_HOST_PORT=5432
+```
+
+In order to correctly set the above required environment variables, please consult your operating system documentation (in Linux, for instance, you can use the **export** command in your `.bashrc` file).
 
 From within the `./src` directory first ensure you are working using your created virtual environment.
 
