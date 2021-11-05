@@ -11,7 +11,6 @@ from models import setup_db, Question, Category
 QUESTIONS_PER_PAGE = 10
 QUESTIONS_TOTAL = 19
 
-
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
@@ -192,7 +191,7 @@ class TriviaTestCase(unittest.TestCase):
         all_have_term = True
         for q in data['questions']:
             if search_term not in q['question'].lower():
-                print('===> "{}" not found in "{}"'.format(search_term, q['question']))
+                self.app.logger.error('===> "{}" not found in "{}"'.format(search_term, q['question']))
                 all_have_term = False
 
         self.assertEqual(res.status_code, 200)

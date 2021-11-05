@@ -1,9 +1,10 @@
 import os, sys
+import logging
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import random as rnd
 from werkzeug.exceptions import HTTPException
+from  sqlalchemy.sql.expression import func
 
 from models import setup_db, Question, Category
 from sqlalchemy.sql.expression import null
@@ -34,9 +35,12 @@ def categories_to_dict(categories_selection):
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
+  app.db = SQLAlchemy(app)
 
   if test_config == None:
     setup_db(app) # create only if it is not a unit test
+
+  logging.basicConfig(filename='backend_errors.log', format='%(asctime)s %(message)s', level=logging.ERROR)
   
   CORS(app)
 
@@ -174,7 +178,7 @@ def create_app(test_config=None):
       abort(422, sys.exc_info())
 
   @app.route('/api/v1.0/questions/search', methods=['POST'])
-  def search_venues():
+  def search_questions():
     try:
       body = request.get_json()
       str_to_search = body.get('searchTerm', '')
@@ -199,40 +203,30 @@ def create_app(test_config=None):
       prev_question = body.get('previous_questions', '')
       quiz_category = body.get('quiz_category', '')
 
-      select_cat = None
+      select = None
+      category_id = int(quiz_category['id'])
 
-      if quiz_category['id'] == 0: # All categories
-        select_cat = Question.query.all()
+      if (category_id > 0):
+        category = app.db.session().query(Category).get(category_id)
+        if (category == None):
+          msg = f'Category "{quiz_category["type"]}" (id={category_id}) not found in the database!'
+          abort(404, msg)
+        
+      total_quizz_questions = -1
+      if category_id == 0: # All categories
+        select = Question.query.filter(~Question.id.in_(prev_question)).order_by(func.random()).all()
+        total_quizz_questions = len(Question.query.all())
       else:
-        select_cat = Question.query.filter_by(category=quiz_category['id']).all()
+        select = Question.query.filter(Question.category == category_id, ~Question.id.in_(prev_question)).order_by(func.random()).all()
+        total_quizz_questions = len(Question.query.filter_by(category=category_id).all())
 
-      if len(select_cat) == 0:
-        msg = 'Category "{}" (id={}) not found in the database!'.format(
-          quiz_category['type'],
-          quiz_category['id'],
-        )
-        abort(404, msg)
-
-
-      allowed_questions = [q for q in select_cat if (q.id not in prev_question)]
-      allowed_questions_cnt =len(select_cat)
-
-      if allowed_questions_cnt > 0:
-        rnd.shuffle(allowed_questions)
-
-        chosen_question = null
-        for q in allowed_questions:
-          if q.id not in prev_question:
-            chosen_question = q
-            break
-
-      next_question = chosen_question.format() if chosen_question != null else ''
+      next_question = select[0].format() if len(select) else ''
     
       return jsonify({
         'success': True,
         'question': next_question,
         'current_category': quiz_category,
-        'total_quizz_questions': allowed_questions_cnt,
+        'total_quizz_questions': total_quizz_questions,
       })
     except HTTPException:
       raise
@@ -244,6 +238,7 @@ def create_app(test_config=None):
   def not_found(error):
     default_msg = "resource not found in the server's database"
     message = error.description if len(error.description) else default_msg
+    app.logger.error('{}{}'.format(error, ((':{}'.format(message)) if (not len(error.description)) else '')))
     return (
       jsonify({
         'success': False,
@@ -257,6 +252,7 @@ def create_app(test_config=None):
   def unprocessable_entity(error):
     default_msg = "your request is correctly formated but the server is unable to process it"
     message = error.description if len(error.description) else default_msg
+    app.logger.error('{}{}'.format(error, ((':{}'.format(message)) if (not len(error.description)) else '')))
     return (
       jsonify({
         'success': False,
@@ -271,6 +267,7 @@ def create_app(test_config=None):
     """Return JSON instead of HTML for HTTP errors."""
     # start with the correct headers and status code from the error
     response = e.get_response()
+    app.logger.error(e)
     # replace the body with JSON
     return (
     jsonify({
