@@ -82,7 +82,7 @@ GET '/categories'
 GET '/questions?page=<page>
 - Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories
 and current category string. 
-- Request Parameters: page - integer indicating the page to be returned
+- Request Parameters: <page> - integer indicating the page to be returned
 - Returns: A JSON object with 10 paginated questions of all categories, total questions, object including the set of all categories, and a success key indicating no error has occurred.
 {
     'questions': [
@@ -110,7 +110,7 @@ and current category string.
 ```js
 GET /api/v1.0/categories/<cat_id>/questions
 - Fetches a dictionary of questions from a specific category
-- Request Parameters: cat_id - integer value indicating category id of the questions to be returned
+- Request Parameters: <cat_id> - integer value indicating category id of the questions to be returned
 - Returns: A JSON object with the categories key, that contains an object of id: category_string key:value pairs, 
 plus a total_categories key, with the total number of stored categories, and a boolean success key, indicating the 
 operation has not failed.
@@ -135,8 +135,11 @@ operation has not failed.
 ```js
 POST /api/v1.0/questions/search
 - Fetches a dictionary of questions matching a given search term
-- Request Parameters: search_term - string to search in the question field of the question objects. The search is
+- Request Parameters: 
+  - <search_term> - string to search in the question field of the question objects. The search is
 case insensitive.
+  - <current_cat_id> - id of the current category of the questions to be searched
+
 - Returns: A JSON object with the questions key, that contains an array of question objects whose question field matches
 the search_term, the total number of categories and a boolean success field that is true if there were no erros.
 {
@@ -145,7 +148,7 @@ the search_term, the total number of categories and a boolean success field that
             'question': 'This is a question',
             'answer': 'This is an answer', 
             'difficulty': 5,
-            'category': 2
+            'category': 2,
         },
     'total_categories': total number of categories,
     'success': True,
