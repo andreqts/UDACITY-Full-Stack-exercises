@@ -11,16 +11,6 @@ from sqlalchemy.sql.expression import null
 
 QUESTIONS_PER_PAGE = 10
 
-def get_paginated_questions(request, selection):
-  page = request.args.get("page", 1, type=int)
-  start = (page - 1) * QUESTIONS_PER_PAGE
-  end = start + QUESTIONS_PER_PAGE
-
-  questions = [question.format() for question in selection]
-  current_questions = questions[start:end]
-
-  return current_questions
-
  
 def categories_to_dict(categories_selection):
   categories = [cat.format() for cat in categories_selection]
@@ -55,13 +45,15 @@ def create_app(test_config=None):
   @app.route('/api/v1.0/questions')
   def get_questions():
     try:
-      selection = Question.query.order_by(Question.id).all()
-      current_questions = get_paginated_questions(request, selection)
+      page = request.args.get("page", 1, type=int)
+      selection = Question.query.order_by(Question.id).limit(QUESTIONS_PER_PAGE).offset((page - 1) * QUESTIONS_PER_PAGE).all()
 
-      if len(current_questions) == 0:
+      if len(selection) == 0:
         page = request.args.get('page', 1, type=int)
         msg = f'Page {page} not found in the database'
         abort(404, msg)
+
+      current_questions = [question.format() for question in selection]
     
       #with_entities returns the fields in a tuple
       categories_selection = Category.query.order_by(Category.id).all()
@@ -71,7 +63,6 @@ def create_app(test_config=None):
             'questions': current_questions,
             'total_questions': len(Question.query.all()),
             'categories': categories_dict,
-            'current_category': '',
             'success': True,
       })
     except HTTPException:
@@ -118,12 +109,13 @@ def create_app(test_config=None):
       question = Question(question=new_question, answer=new_answer, difficulty=new_difficulty, category=new_category)
       question.insert()
 
-      selection = Question.query.all()
+      selection = Question.query.with_entities(func.count(Question.id)).all()
+      total_questions = selection[0][0]
 
       return jsonify({
         'success': True,
         'created_id': question.id,
-        'total_questions': len(selection),
+        'total_questions': total_questions,
       })
     except HTTPException:
       raise
@@ -153,13 +145,14 @@ def create_app(test_config=None):
   def get_questions_by_category(cat_id):
     category = []
     try:
-      category = Category.query.get(cat_id)
+      page = request.args.get("page", 1, type=int)
+      category = app.db.session().query(Category).get(cat_id)
 
       if (category is None):
         msg = f'Category {cat_id} not found in the database'
         abort(404, msg)
 
-      selection = Question.query.filter_by(category=cat_id).all()
+      selection = Question.query.filter_by(category=cat_id).order_by(Question.id).limit(QUESTIONS_PER_PAGE).offset((page - 1) * QUESTIONS_PER_PAGE).all()
 
       total_questions = len(selection)
       assert(total_questions <= QUESTIONS_PER_PAGE)
@@ -169,7 +162,7 @@ def create_app(test_config=None):
       return jsonify({
         'success': True,
         'questions': questions,
-        'total_questions': len(Question.query.all()),
+        'total_questions': len(Question.query.filter_by(category=cat_id).all()),
         'current_category': category.type,
       })
     except HTTPException:
@@ -182,14 +175,25 @@ def create_app(test_config=None):
     try:
       body = request.get_json()
       str_to_search = body.get('searchTerm', '')
-      selection = Question.query.filter(Question.question.ilike(f'%{str_to_search}%')).all()
+      current_cat_id = body.get('currentCategory', 0)
+
+      selection = None
+      total_questions = 0
+      if (current_cat_id == 0):
+        selection = Question.query.filter(Question.question.ilike(f'%{str_to_search}%')).all()
+        total_questions = Question.query.with_entities(func.count()).filter(Question.question.ilike(f'%{str_to_search}%')).all()
+      else:
+        selection = Question.query.filter(Question.question.ilike(f'%{str_to_search}%'), Question.category==current_cat_id).all()
+        total_questions = Question.query.with_entities(func.count()).filter(Question.question.ilike(f'%{str_to_search}%'), Question.category==current_cat_id).all()
+
+      total_questions = total_questions[0][0] #extracts the numerical value which is inside a list of tuples
+
       questions_found = [question.format() for question in selection]
 
       return jsonify({
         'success': True,
         'questions': questions_found,
-        'total_questions': len(Question.query.all()),
-        'current_category': '',
+        'total_questions': total_questions,
       })
     except HTTPException:
       raise

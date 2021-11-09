@@ -184,7 +184,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_search_questions(self):
         search_term = 'the'
-        res = self.client().post("/api/v1.0/questions/search", json={ 'searchTerm': search_term })
+        res = self.client().post("/api/v1.0/questions/search", json={'searchTerm': search_term, 'currentCategory': 0})
         data = json.loads(res.data)
         EXPECTED_TOTAL_MIN = 10
 
@@ -198,7 +198,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(len(data["questions"]) > EXPECTED_TOTAL_MIN)
         self.assertTrue(all_have_term)
-        self.assertEqual(data["total_questions"], len(Question.query.all()))
+        self.assertEqual(data["total_questions"], len(data["questions"]))
 
     def test_quizz(self):
         res = self.client().post("/api/v1.0/quizzes", json={
@@ -236,7 +236,7 @@ class TriviaTestCase(unittest.TestCase):
             })
         data = json.loads(res.data)
 
-        self.assertFalse(data["success"])
+        self.assertFalse(data['success'])
         self.assertEqual(data['error'], 404)
         self.assertEqual(data['message'], 'Category "Nonexistent" (id=1000) not found in the database!')
 

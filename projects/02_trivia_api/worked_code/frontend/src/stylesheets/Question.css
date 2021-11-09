@@ -8,6 +8,10 @@
   flex-shrink: 2;
 }
 
+li.categories-li.active {
+  color: blue;
+}
+
 .categories-list > form {
   width: 60%;
 }

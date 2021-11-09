@@ -13,7 +13,7 @@ class QuestionView extends Component {
       page: 1,
       totalQuestions: 0,
       categories: {},
-      currentCategory: null,
+      currentCategory: 0,
     }
   }
 
@@ -22,6 +22,8 @@ class QuestionView extends Component {
   }
 
   getQuestions = () => {
+    if (this.state.currentCategory !== 0) 
+      this.state.page = 1; // in case the current category has changed, returns for the first page
     $.ajax({
       url: `/api/v1.0/questions?page=${this.state.page}`,
       type: "GET",
@@ -30,8 +32,8 @@ class QuestionView extends Component {
           questions: result.questions,
           totalQuestions: result.total_questions,
           categories: result.categories,
-          currentCategory: result.current_category 
-        })
+          currentCategory: 0, // all categories are current or active
+        });
         return;
       },
       error: (error) => {
@@ -42,7 +44,7 @@ class QuestionView extends Component {
   }
 
   selectPage(num) {
-    this.setState({page: num}, () => this.getQuestions());
+    this.setState({page: num}, () => ((this.state.currentCategory === 0) ? this.getQuestions() : this.getByCategory(this.state.currentCategory)));
   }
 
   createPagination(){
@@ -59,15 +61,17 @@ class QuestionView extends Component {
     return pageNumbers;
   }
 
-  getByCategory= (id) => {
+  getByCategory = (id) => {
+    if (id !== this.state.currentCategory) 
+      this.state.page = 1; // in case the current category has changed, returns for the first page
     $.ajax({
-      url: `/api/v1.0/categories/${id}/questions`,
+      url: `/api/v1.0/categories/${id}/questions?page=${this.state.page}`,
       type: "GET",
       success: (result) => {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
-          currentCategory: result.current_category })
+          currentCategory: id, });
         return;
       },
       error: (error) => {
@@ -83,7 +87,7 @@ class QuestionView extends Component {
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({searchTerm: psearchTerm}),
+      data: JSON.stringify({searchTerm: psearchTerm, currentCategory: this.state.currentCategory}),
       xhrFields: {
         withCredentials: true
       },
@@ -92,7 +96,7 @@ class QuestionView extends Component {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
-          currentCategory: result.current_category });
+        });
         return;
       },
       error: (error) => {
@@ -127,9 +131,9 @@ class QuestionView extends Component {
           <h2 onClick={() => {this.getQuestions()}}>Categories</h2>
           <ul>
             {Object.keys(this.state.categories).map((id, ) => (
-              <li key={id} onClick={() => {this.getByCategory(id)}}>
+              <li key={id} className={`categories-li ${(id === this.state.currentCategory) ? 'active' : ''}`} onClick={() => { this.getByCategory(id) }}> 
                 {this.state.categories[id]}
-                <img className="category" src={`${this.state.categories[id].toLowerCase()}.svg`}/>
+                <img className={`category ${id === this.state.currentCategory ? 'active' : ''}`} src={`${this.state.categories[id].toLowerCase()}.svg`}/>
               </li>
             ))}
           </ul>
@@ -151,7 +155,6 @@ class QuestionView extends Component {
             {this.createPagination()}
           </div>
         </div>
-
       </div>
     );
   }
