@@ -83,8 +83,7 @@ GET '/questions?page=<page>
 - Fetches a paginated set of questions, with a maximum of 10 questions per page, a total number of questions, all categories
 and current category string. 
 - Request Parameters: page - integer indicating the page to be returned
-- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, a current category
-string, and a success key indicating no error has occurred.
+- Returns: A JSON object with 10 paginated questions of all categories, total questions, object including the set of all categories, and a success key indicating no error has occurred.
 {
     'questions': [
         {
@@ -103,7 +102,6 @@ string, and a success key indicating no error has occurred.
     '4' : "History",
     '5' : "Entertainment",
     '6' : "Sports" },
-    'current_category': 'History',
     'success': True,
 }
 ```
