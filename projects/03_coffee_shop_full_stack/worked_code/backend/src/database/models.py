@@ -1,13 +1,23 @@
 import os
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
+#from flask_migrate import Migrate
 import json
 
 database_filename = "database.db"
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filename))
 
+database_name = os.getenv('UDACITYCOFFEE_DB_NAME')
+db_username = os.getenv('UDACITYCOFFEE_DB_USER')
+db_userpassword = os.getenv('UDACITYCOFFEE_DB_PASSWORD')
+db_host = os.getenv('UDACITYCOFFEE_DB_HOST')
+db_host_port = os.getenv('UDACITYCOFFEE_DB_HOST_PORT')
+
 db = SQLAlchemy()
+
+# connect to a local postgresql database
+#migrate = Migrate(app, db)
 
 '''
 setup_db(app)
