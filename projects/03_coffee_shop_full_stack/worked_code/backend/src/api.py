@@ -5,6 +5,7 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
+from  sqlalchemy.sql.expression import func
 
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
@@ -60,6 +61,7 @@ def drinks():
 @requires_auth('get:drinks-detail')
 def drinks_detail(jwt):
     print(f'jwt = "{jwt}"')
+
     drinks = Drink.query.order_by(Drink.id).all()
 
     drinks_detailed = [drink.long() for drink in drinks]
@@ -80,7 +82,31 @@ def drinks_detail(jwt):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route("/drinks", methods=['POST'])
+@requires_auth('post:drinks')
+def add_drinks(jwt):
+    try:
+        body = request.get_json()
 
+        new_title = body.get('title', '')
+        new_recipe = body.get('recipe', '')
+ 
+        new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
+        new_drink.insert()
+
+        selection = Drink.query.with_entities(func.count(Drink.id)).all()
+        total_drinks = selection[0][0]
+
+        return jsonify({
+            'success': True,
+            'created_id': new_drink.id,
+            'total_drinks': total_drinks,
+            #TODOAQ:
+        })
+    except HTTPException:
+        raise
+    except:
+        abort(422, sys.exc_info())
 
 '''
 @TODO implement endpoint
@@ -107,49 +133,19 @@ def drinks_detail(jwt):
 '''
 
 
-# Error Handling
-'''
-Example error handling for unprocessable entity
-'''
-
-
-@app.errorhandler(422)
-def unprocessable(error):
-    return jsonify({
-        "success": False,
-        "error": 422,
-        "message": "unprocessable"
-    }), 422
-
-
-'''
-@TODO implement error handlers using the @app.errorhandler(error) decorator
-    each error handler should return (with approprate messages):
-             jsonify({
-                    "success": False,
-                    "error": 404,
-                    "message": "resource not found"
-                    }), 404
-
-'''
-
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above
-'''
-
-
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above
-'''
-
 if __name__ == "__main__":
     app.debug = True
     app.run()
 
 
 # DEFAULT ERROR HANDLERS
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
+
+
 @app.errorhandler(404)
 def not_found(error):
     default_msg = "resource not found in the server's database"
@@ -164,6 +160,7 @@ def not_found(error):
         404,
     )
 
+
 @app.errorhandler(422)
 def unprocessable_entity(error):
     default_msg = "your request is correctly formated but the server is unable to process it"
@@ -177,6 +174,7 @@ def unprocessable_entity(error):
         }),
         422,
     )
+
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
