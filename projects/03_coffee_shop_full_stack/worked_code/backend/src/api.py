@@ -101,7 +101,6 @@ def add_drinks(jwt):
             'success': True,
             'created_id': new_drink.id,
             'total_drinks': total_drinks,
-            #TODOAQ:
         })
     except HTTPException:
         raise
