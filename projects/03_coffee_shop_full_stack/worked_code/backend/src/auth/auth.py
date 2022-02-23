@@ -77,7 +77,7 @@ def check_permissions(permission, payload):
 
 def verify_decode_jwt(token):
     '''
-    @TODO implement verify_decode_jwt(token) method
+    @verify_decode_jwt(token) method
         @INPUTS
             token: a json web token (string)
 
