@@ -40,7 +40,7 @@ def drinks():
         drinks_short = [drink.short() for drink in drinks]
 
         return jsonify({
-                'drinks_short': drinks_short,
+                'drinks': drinks_short,
                 'total_drinks': len(drinks_short),
                 'success': True,
         })
@@ -67,7 +67,7 @@ def drinks_detail(jwt):
         drinks_detailed = [drink.long() for drink in drinks]
 
         return jsonify({
-                'drinks_long': drinks_detailed,
+                'drinks': drinks_detailed,
                 'total_drinks': len(drinks_detailed),
                 'success': True,
         })
