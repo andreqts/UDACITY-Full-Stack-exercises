@@ -22,6 +22,7 @@ CORS(app)
 '''
 # db_drop_and_create_all()
 
+
 # ROUTES
 '''
 @TODO implement endpoint
@@ -60,17 +61,20 @@ def drinks():
 @app.route("/drinks-detail")
 @requires_auth('get:drinks-detail')
 def drinks_detail(jwt):
-    print(f'jwt = "{jwt}"')
+    try:
+        drinks = Drink.query.order_by(Drink.id).all()
 
-    drinks = Drink.query.order_by(Drink.id).all()
+        drinks_detailed = [drink.long() for drink in drinks]
 
-    drinks_detailed = [drink.long() for drink in drinks]
-
-    return jsonify({
-            'drinks_long': drinks_detailed,
-            'total_drinks': len(drinks_detailed),
-            'success': True,
-      })
+        return jsonify({
+                'drinks_long': drinks_detailed,
+                'total_drinks': len(drinks_detailed),
+                'success': True,
+        })
+    except HTTPException:
+        raise
+    except:
+        abort(422, sys.exc_info())
 
 
 '''
@@ -90,6 +94,16 @@ def add_drinks(jwt):
 
         new_title = body.get('title', '')
         new_recipe = body.get('recipe', '')
+        if not (len(new_title) and len(new_recipe)):
+            desc = '' if len(new_title) else 'title '
+            is_plural = False
+            if not len(new_recipe):
+                if len(desc):
+                    is_plural = True
+                    desc += 'and recipe'
+            desc += 'fields are ' if is_plural else 'field is '
+            desc += 'empty or missing'
+            abort(400, desc)
  
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
         new_drink.insert()
@@ -99,13 +113,13 @@ def add_drinks(jwt):
 
         return jsonify({
             'success': True,
-            'created_id': new_drink.id,
-            'total_drinks': total_drinks,
+            'drinks': [ new_drink.long() ],
         })
     except HTTPException:
         raise
     except:
         abort(422, sys.exc_info())
+
 
 '''
 @TODO implement endpoint
@@ -118,6 +132,14 @@ def add_drinks(jwt):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route("/drinks/<int:drink_id>", methods=['PATCH'])
+@requires_auth('patch:drinks')
+def patch_drinks(jwt, drink_id):
+    print(f'PATCH "{jwt}"')
+    print(f'id = "{drink_id}"')
+    return jsonify({
+            'success': True, #TODOAQ:
+        })
 
 
 '''
@@ -144,6 +166,19 @@ def handle_auth_error(ex):
     response.status_code = ex.status_code
     return response
 
+@app.errorhandler(400)
+def bad_request(error):
+    default_msg = "server received a bad request"
+    message = '{}: {}'.format(default_msg, error.description)
+    app.logger.error('{}{}'.format(error, ((':{}'.format(message)) if (not len(error.description)) else '')))
+    return (
+        jsonify({
+        'success': False,
+        'error': 400,
+        'message': message
+        }),
+        400,
+    )
 
 @app.errorhandler(404)
 def not_found(error):
