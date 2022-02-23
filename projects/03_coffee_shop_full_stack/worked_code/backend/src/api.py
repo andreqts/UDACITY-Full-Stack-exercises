@@ -90,6 +90,8 @@ def check_post_data(new_title, new_recipe):
             if len(desc):
                 is_plural = True
                 desc += 'and recipe '
+            else:
+                desc += 'recipe '
         desc += 'fields are ' if is_plural else 'field is '
         desc += 'empty or missing'
         assert(len(desc)) #sanity
@@ -146,19 +148,31 @@ def add_drinks(jwt):
 @app.route("/drinks/<int:drink_id>", methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drinks(jwt, drink_id):
-    print(f'PATCH "{jwt}"')
-    print(f'id = "{drink_id}"')
-    #try:
-    body = request.get_json()
+    try:
+        drink_to_patch = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        if drink_to_patch is None:
+            abort(404, f'drink id={drink_id} not found')
 
-    new_title = body.get('title', '')
-    new_recipe = body.get('recipe', '')
-    error_desc = check_post_data(new_title, new_recipe)
-    if len(error_desc):
-        abort(400, error_desc)
-    return jsonify({
-        'success': True, #TODOAQ:
-    })
+        body = request.get_json()
+
+        new_title = body.get('title', '')
+        new_recipe = body.get('recipe', '')
+        error_desc = check_post_data(new_title, new_recipe)
+        if len(error_desc):
+            abort(400, error_desc)
+
+        drink_to_patch.title = new_title
+        drink_to_patch.recipe = json.dumps(new_recipe)
+        drink_to_patch.update()
+
+        return jsonify({
+            'success': True,
+            'drinks': drink_to_patch.long()
+        })
+    except HTTPException:
+        raise
+    except:
+        abort(422, sys.exc_info())
 
 
 '''
@@ -185,6 +199,7 @@ def handle_auth_error(ex):
     response.status_code = ex.status_code
     return response
 
+
 @app.errorhandler(400)
 def bad_request(error):
     default_msg = "server received a bad request"
@@ -198,6 +213,7 @@ def bad_request(error):
         }),
         400,
     )
+
 
 @app.errorhandler(404)
 def not_found(error):
