@@ -77,6 +77,24 @@ def drinks_detail(jwt):
         abort(422, sys.exc_info())
 
 
+def check_post_data(new_title, new_recipe):
+    """
+    Returns the error description if post (or patch) parameters are invalid,
+    or an empty string if they are valid
+    """
+    desc = ''
+    if not (len(new_title) and len(new_recipe)):
+        desc = '' if len(new_title) else 'title '
+        is_plural = False
+        if not len(new_recipe):
+            if len(desc):
+                is_plural = True
+                desc += 'and recipe '
+        desc += 'fields are ' if is_plural else 'field is '
+        desc += 'empty or missing'
+        assert(len(desc)) #sanity
+    return desc
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -94,16 +112,9 @@ def add_drinks(jwt):
 
         new_title = body.get('title', '')
         new_recipe = body.get('recipe', '')
-        if not (len(new_title) and len(new_recipe)):
-            desc = '' if len(new_title) else 'title '
-            is_plural = False
-            if not len(new_recipe):
-                if len(desc):
-                    is_plural = True
-                    desc += 'and recipe'
-            desc += 'fields are ' if is_plural else 'field is '
-            desc += 'empty or missing'
-            abort(400, desc)
+        error_desc = check_post_data(new_title, new_recipe)
+        if len(error_desc):
+            abort(400, error_desc)
  
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
         new_drink.insert()
@@ -137,9 +148,17 @@ def add_drinks(jwt):
 def patch_drinks(jwt, drink_id):
     print(f'PATCH "{jwt}"')
     print(f'id = "{drink_id}"')
+    #try:
+    body = request.get_json()
+
+    new_title = body.get('title', '')
+    new_recipe = body.get('recipe', '')
+    error_desc = check_post_data(new_title, new_recipe)
+    if len(error_desc):
+        abort(400, error_desc)
     return jsonify({
-            'success': True, #TODOAQ:
-        })
+        'success': True, #TODOAQ:
+    })
 
 
 '''
